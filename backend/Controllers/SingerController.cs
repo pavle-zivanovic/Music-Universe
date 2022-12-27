@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models;
 using Neo4jClient;
+using ServiceStack.Redis;
 
 namespace Music_Universe.Controllers
 {
@@ -13,17 +14,19 @@ namespace Music_Universe.Controllers
     [Route("[controller]")]
     public class SingerController : ControllerBase
     {
-        private readonly IGraphClient _neo4j;
+        private readonly IGraphClient neo4j;
+        private readonly RedisClient redis = 
+        new("redis://default:redispw@localhost:49153");
 
-        public SingerController(IGraphClient neo4j)
+        public SingerController(IGraphClient _neo4j)
         {
-                _neo4j = neo4j;
+                neo4j = _neo4j;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateSinger([FromBody] Singer s)
         {
-            await _neo4j.Cypher.Create("(s:Singer $s)")
+            await neo4j.Cypher.Create("(s:Singer $s)")
                                 .WithParam("s", s)
                                 .ExecuteWithoutResultsAsync();
 
@@ -32,11 +35,24 @@ namespace Music_Universe.Controllers
 
         [Route("Get singers from neo4j")]
         [HttpGet]
-        public async Task<IActionResult> GetSingerNeo4j(){
-            var singers = await _neo4j.Cypher.Match("(n: Singer)")
-                                             .Return(n => n.As<Singer>()).ResultsAsync;
+        public async Task<IActionResult> GetSingerNeo4j()
+        {
+            var singers = await neo4j.Cypher.Match("(n: Singer)")
+                                             .Return(n => new 
+                                             {
+                                               Singer = n.As<Singer>()
+                                             }).ResultsAsync;
 
             return Ok(singers);
+        }
+
+        [Route("Get singers from redis")]
+        [HttpGet]
+        public string GetSingerRedis()
+        {
+            var singer = redis.Get<string>("name");
+
+            return singer;
         }
     }
 }
