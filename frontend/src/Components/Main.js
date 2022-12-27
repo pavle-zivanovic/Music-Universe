@@ -1,5 +1,5 @@
 import * as React from 'react';
-import '../Styles/MainScreen.css';
+import '../Styles/Main.css';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,6 +15,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import Featured from './Featured';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter ,Route ,Routes, Navigate} from "react-router-dom";
+import LoginForm from './LoginForm';
+import ForYou from './ForYou';
+import Charts from './Charts';
+
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -55,54 +62,53 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   }));
 
-const pages = ['Charts', 'Featured', 'For you'];
+const pages = [
+  {
+    id: 0,
+    text: "Featured",
+    path: ""
+  },
+  {
+    id: 1,
+    text: "For you",
+    path: "foryou"
+  },
+  {
+    id: 2,
+    text: "Charts",
+    path: "charts"
+  }
+]
 
-function MainScreen(){
-    
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+function Main(){
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [mobileOpenRight, setMobileOpenRight] = React.useState(null);
+  const isMobileMenuOpenRight = Boolean(mobileOpenRight);
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleMobileMenuOpenRight = (event) => {
+    setMobileOpenRight(event.currentTarget);
+  };
+  
+  const handleMobileMenuCloseRight = () => {
+    setMobileOpenRight(null);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-      <Menu
-        anchorEl={mobileMoreAnchorEl}
+  const renderMobileMenuRight = (
+    <Menu
+        anchorEl={mobileOpenRight}
         anchorOrigin={{
             vertical: 'top',
             horizontal: 'right',
         }}
-        id={mobileMenuId}
         keepMounted
-        transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-        }}
-        open={isMobileMenuOpen}
-        onClose={handleMobileMenuClose}
+        open={isMobileMenuOpenRight}
+        onClose={handleMobileMenuCloseRight}
         >
         <MenuItem> 
             <IconButton
             size="large"
-            aria-label="show 17 new notifications"
             >
             <Badge badgeContent={17} color="error">
                 <NotificationsIcon/>
@@ -110,38 +116,73 @@ function MainScreen(){
             </IconButton>
             <p>Notifications</p>
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuOpen}>
+        <MenuItem>
             <IconButton
             size="large"
-            aria-label="account of current user"
-            aria-controls="primary-search-account-menu"
-            aria-haspopup="true"
             >
             <AccountCircle />
             </IconButton>
             <p>Profile</p>
         </MenuItem>
-        </Menu>
+      </Menu>
+  );
+
+
+  const [mobileOpenLeft, setMobileOpenLeft] = React.useState(null);
+  const isMobileMenuOpenLeft = Boolean(mobileOpenLeft);
+
+  const handleMobileMenuOpenLeft = (event) => {
+    setMobileOpenLeft(event.currentTarget);
+  };
+  
+  const handleMobileMenuCloseLeft = () => {
+    setMobileOpenLeft(null);
+  };
+
+  const renderMobileMenuLeft = (
+    <Menu
+        anchorEl={mobileOpenLeft}
+        anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+        }}
+        keepMounted
+        open={isMobileMenuOpenLeft}
+        onClose={handleMobileMenuCloseLeft}
+        >
+          {pages.map((page) => (
+                <MenuItem 
+                  key={page.id}
+                  onClick={() => navigate(page.path)}
+                  className={location.pathname == "/Main" + page.path ? "active" 
+                  :location.pathname == "/Main/" + page.path ? "active" : null}
+                  >
+                  <p>{page.text}</p>
+                </MenuItem>
+          ))}
+      </Menu>
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, width:"100%" }}>
       <AppBar 
-       position="static" 
-       sx={{backgroundColor: "rgb(153, 102, 203)"}}>
+       position="sticky" 
+       sx={{backgroundColor: "rgb(161, 34, 161)", width:"100%"}}>
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            aria-label="open drawer"
-            sx={{ mr: 2, 
-            color:"rgb(15, 6, 26)"}}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ display: { sm: 'none', md: 'none' } }}>
+              <IconButton
+                size="large"
+                edge="start"
+                aria-label="open drawer"
+                sx={{ mr: 2, 
+                color:"rgb(15, 6, 26)"}}
+                onClick={handleMobileMenuOpenLeft}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
           <Typography
             variant="h6"
-            noWrap
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' },  
             fontWeight:"bold",
@@ -163,18 +204,21 @@ function MainScreen(){
           </Typography>
           {pages.map((page) => (
                 <MenuItem 
-                key={page}
-                size="large"
-                sx={{ mr: 2, 
-                display: { xs: 'none', sm: 'block' }}}
-                >
-                  <Typography 
-                  textAlign="center"
-                  variant="h6"
-                  noWrap
-                  sx={{ fontFamily: "MingLiU-ExtB",
-                  fontWeight:"bold"
-                 }}>{page}</Typography>
+                  key={page.id}
+                  size="large"
+                  onClick={() => navigate(page.path)}
+                  className={location.pathname == "/Main" + page.path ? "active" 
+                  :location.pathname == "/Main/" + page.path ? "active" : null}
+                  sx={{ mr: 2, 
+                  display: { xs: 'none', sm: 'block' }}}
+                  >
+                    <Typography 
+                    textAlign="center"
+                    variant="h6"
+                    noWrap
+                    sx={{ fontFamily: "MingLiU-ExtB",
+                    fontWeight:"bold"
+                  }}>{page.text}</Typography>
                 </MenuItem>
           ))}
           <Search 
@@ -202,7 +246,6 @@ function MainScreen(){
               edge="end"
               aria-label="account of current user"
               aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
             >
               <AccountCircle />
             </IconButton>
@@ -211,20 +254,26 @@ function MainScreen(){
             <IconButton
               size="large"
               aria-label="show more"
-              aria-controls={mobileMenuId}
               aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
+              onClick={handleMobileMenuOpenRight}
             >
               <MoreIcon />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
+      {renderMobileMenuLeft}
+      {renderMobileMenuRight}
+      <div className="divRoutes">
+            <Routes>
+                <Route path="" element={<Featured />} />
+                <Route path="foryou" element={<ForYou />} />
+                <Route path="charts" element={<Charts />} />
+                <Route path="/*" element={<LoginForm />} />
+            </Routes>
+      </div>
     </Box>
   );
-
 }
 
-
-export default MainScreen;
+export default Main;

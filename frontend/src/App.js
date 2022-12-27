@@ -3,7 +3,7 @@ import * as React from 'react';
 import { BrowserRouter ,Route ,Routes, Navigate} from "react-router-dom";
 
 // Components 
-import MainScreen from './Components/MainScreen';
+import Main from './Components/Main';
 import LoginForm from './Components/LoginForm';
 import SignUpForm from './Components/SignUpForm';
 
@@ -13,7 +13,7 @@ function App() {
   return (
     <div className='App'>
       <Routes>
-        <Route  path= "/Main" element={<MainScreen />}/>
+        <Route  path= "/Main/*" element={<Main />}/>
         <Route  path= "/SignUp" element={<SignUpForm />}/>
         <Route  path= "/" element={<LoginForm/>}/>      
         <Route path="*" element={<Navigate to = "/" />}></Route>
