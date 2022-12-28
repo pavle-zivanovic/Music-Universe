@@ -29,7 +29,6 @@ function Featured(){
                                     placement="top">
                                 <div className="songCircle"
                                 style={{backgroundImage:'url("../Images/maya.jpg")'}}>
-                                
                                     <div className="innerSongCircle"></div>
                                 </div>
                             </Tooltip>

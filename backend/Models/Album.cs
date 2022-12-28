@@ -11,6 +11,10 @@ namespace Models
 
        public int year { get; set; }
 
+       public string cover { get; set; }
+
        public List<Song> songs { get; set; }
+
+       public List<Singer> singer { get; set; }
     }
 }

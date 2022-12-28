@@ -14,9 +14,9 @@ body{
   .MuiFilledInput-root{
     background-color: blueviolet !important;
   }
-  .Mui-focused{
+  /*.Mui-focused{
     background-color: rgb(24, 23, 23) !important;
-  }
+  }*/
 
 
   .divMain{

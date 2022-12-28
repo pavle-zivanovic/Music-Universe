@@ -16,5 +16,7 @@ namespace Models
        public string biography { get; set; }
 
        public List<Song> songs { get; set; }
+
+       public List<Album> albums { get; set; }
     }
 }
