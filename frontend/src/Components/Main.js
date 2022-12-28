@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { useState } from 'react';
 import '../Styles/Main.css';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
+import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
+import {Button} from '@mui/material'
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -21,6 +24,14 @@ import { BrowserRouter ,Route ,Routes, Navigate} from "react-router-dom";
 import LoginForm from './LoginForm';
 import ForYou from './ForYou';
 import Charts from './Charts';
+import { SettingsPowerRounded } from '@mui/icons-material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { FormControlLabel, TextField } from "@mui/material";
+import FileUpload from "react-mui-fileuploader"
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -86,6 +97,27 @@ function Main(){
   
   const [mobileOpenRight, setMobileOpenRight] = React.useState(null);
   const isMobileMenuOpenRight = Boolean(mobileOpenRight);
+  const [open, setOpen] = React.useState(false)
+  const [songID, setSongID] = React.useState(null);
+  const [songName , setSongName] = React.useState('');
+  const [singerName , setSingerName] = React.useState('');
+  const [albumName , setAlbumName] = React.useState('');
+  const [songWritter ,setSongWritter] = React.useState('');
+  const [songGenre , setSongGenre] = React.useState('');
+  const [releaseDate , setReleaseDate] = React.useState('');
+  const [songLyrics ,setSongLyrics] = React.useState('');
+  const [songFile ,setSongFile] = React.useState('');
+  const [coverImage ,setCoverImage] = React.useState('');
+  const [nameError , setNameError] = useState(false)
+  const [singerError , setSingerError] = useState(false)
+  const [genreError , setGenreError] = useState(false)
+  const [lyricsError , setLyricsError] = useState(false)
+  const [albumError , setAlbumError] = useState(false)
+  const [writterError , setWritterError] = useState(false)
+  const [dateError , setDateError] = useState(false)
+  const [songFileError , setSongFileError] = useState(false)
+  const [coverImageError , setCoverImageError] = useState(false)
+
 
   const handleMobileMenuOpenRight = (event) => {
     setMobileOpenRight(event.currentTarget);
@@ -94,6 +126,24 @@ function Main(){
   const handleMobileMenuCloseRight = () => {
     setMobileOpenRight(null);
   };
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleClick = () => {
+    setOpen(true)
+  }
+  const handleSubmit = () => {
+    alert("Song : "  + songName + "\n" +
+          "Singer :" + singerName + "\n" +
+          "Album :" + albumName + "\n" +
+          "Release Date :" + releaseDate + "\n" +
+          "Song Writter :" + songWritter + "\n" +
+          "Genre : " + songGenre + "\n" +
+          "Lyrics  :" + songLyrics[0] + "\n" 
+    )
+    setOpen(false)
+  }
 
   const renderMobileMenuRight = (
     <Menu
@@ -124,6 +174,7 @@ function Main(){
             </IconButton>
             <p>Profile</p>
         </MenuItem>
+
       </Menu>
   );
 
@@ -176,7 +227,7 @@ function Main(){
                 aria-label="open drawer"
                 sx={{ mr: 2, 
                 color:"rgb(15, 6, 26)"}}
-                onClick={handleMobileMenuOpenLeft}
+                
               >
                 <MenuIcon />
               </IconButton>
@@ -234,6 +285,15 @@ function Main(){
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
+              onClick={handleClick}
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-haspopup="true"
+            >
+              <AddIcon />
+            </IconButton>
+            <IconButton
               size="large"
               aria-label="show 17 new notifications"
             >
@@ -262,9 +322,99 @@ function Main(){
           </Box>
         </Toolbar>
       </AppBar>
+
       {renderMobileMenuLeft}
       {renderMobileMenuRight}
       <div className="divRoutes">
+      <Dialog open={open} onClose={handleClose}>
+             <DialogTitle style={{
+                backgroundColor : "rgb(46, 45, 45)" ,
+                color : "white" ,
+             }}>
+               Add your song
+             </DialogTitle>
+              <DialogContent style={{
+                 backgroundColor : "rgb(46, 45, 45)" ,
+              }}>
+                  <TextField id="outlined-basic" label="Song Title" inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'} required 
+                    error={nameError}  onChange={(e) => setSongName(e.target.value)}
+                        sx={{
+                          width :"45%",
+                          marginRight: "5%",
+                          marginTop : "2.5%",
+                          marginBottom : "5%",
+                          }}/>   
+                  <TextField id="outlined-basic" label="Singer" inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'} required 
+                    error={singerError}  onChange={(e) => setSingerName(e.target.value)}
+                        sx={{
+                          width :"45%",
+                          marginLeft : "5%",
+                          marginTop : "2.5%",
+                          marginBottom : "5%",
+                          }}/>                             
+                  <TextField id="outlined-basic" label="Album" inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'}  
+                    error={albumError}  onChange={(e) => setAlbumName(e.target.value)}
+                        sx={{
+                          width :"45%",
+                          marginRight : "5%",
+                          marginTop : "2.5%",
+                          marginBottom : "5%",
+                          }}/>   
+                  <TextField id="outlined-basic" label="Song Writter" inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'}  required
+                    error={writterError}  onChange={(e) => setSongWritter(e.target.value)}
+                        sx={{
+                          width :"45%",
+                          marginLeft : "5%",
+                          marginTop : "2.5%",
+                          marginBottom : "5%",
+                          }}/>                                           
+                  <TextField id="outlined-basic" label="Song Genre"  inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'} required 
+                      error={genreError}  onChange={(e) => setSongGenre(e.target.value)}
+                          sx={{
+                           width :"45%",
+                           marginRight : "5%",
+                           marginTop : "2.5%",
+                           marginBottom : "5%",
+                           }}/> 
+                  <TextField id="outlined-basic" label="Release Date"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="date" color="primary" maxRows ={'1'} required 
+                      error={dateError}  onChange={(e) => setReleaseDate(e.target.value)}
+                          sx={{
+                           width :"45%",
+                           marginLeft : "5%",
+                           marginTop : "2.5%",
+                           marginBottom : "5%",
+                           }}/>                                  
+                  <TextField onChange={ (e) => setSongLyrics(e.target.value) } //error={projDescError}
+                      error={lyricsError} id="outlined-basic" label="Lyrics"  inputProps={{ style: { fontFamily: 'Arial', color: 'white'}}} InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" 
+                          multiline 
+                          required
+                          rows={'5'}
+                          //maxRows={'5'}  
+                          sx={{ width : "100%", height: "40%"}}/>
+                  <TextField id="outlined-basic" label="Song File"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="file" color="primary" maxRows ={'1'} required 
+                      error={songFileError}  onChange={(e) => setSongFile(e.target.value)}
+                          sx={{
+                           width :"45%",
+                           marginRight : "5%",
+                           marginTop : "2.5%",
+                           marginBottom : "5%",
+                           }}/>
+                  <TextField id="outlined-basic" label="Cover Image"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="file" color="primary" maxRows ={'1'} required 
+                      error={coverImageError}  onChange={(e) => setCoverImage(e.target.value)}
+                          sx={{
+                           width :"45%",
+                           marginLeft : "5%",
+                           marginTop : "2.5%",
+                           marginBottom : "5%",
+                           }}/>                                                 
+              </DialogContent>
+              <DialogActions style={{
+                 backgroundColor :"rgb(46, 45, 45)",
+              }}>
+              <Button onClick={handleClose} color="secondary" sx={{fontWeight:"bold"}}>Cancel</Button>
+              <Button onClick={handleSubmit} variant="contained" color="secondary" sx={{fontWeight:"bold"}}>Sumbit</Button>
+             </DialogActions>
+        </Dialog> 
             <Routes>
                 <Route path="" element={<Featured />} />
                 <Route path="foryou" element={<ForYou />} />
