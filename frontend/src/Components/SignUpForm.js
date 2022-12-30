@@ -27,19 +27,16 @@ function SignUp(){
     const darkMode = true 
     document.body.style.backgroundColor = darkMode ? "rgb(15, 6, 25)" :"azure";
 
-   /* async function signUP(){
+    async function signUP(){
 
         const user = {
-            korisnickoIme: userName,
-            lozinka: passWord,
-            ime: firstName,
-            prezime: lastName,
+            userName: userName,
+            password: passWord,
             email: email,
-            brTelefona: phoneNo
+           
        }
-       //console.log(JSON.stringify(user))
        try{
-        let result = await fetch("https://localhost:5001/Korisnik/UnesiKorisnika/", {
+        let result = await fetch("https://localhost:5001/User/SignUp/", {
             method : 'POST',
             headers : {
               'Content-Type': 'application/json; charset=utf-8',
@@ -48,25 +45,19 @@ function SignUp(){
             body : JSON.stringify(user)
           });
           let a = await result.json();
-          //console.log(a);
-          //console.log(JSON.stringify(a));
 
-          //localStorage.setItem('user-info',JSON.stringify(a))
-          //result  = await result.json();
-          //console.log(result.status);
           if (a === 1){
-            routeChange()
+            navigate("/")
         
           }
-          else if (a === 2){
-             alert("Korisnik sa datim emailom vec postoji !")
+          else if (a === 0){
+             alert("Korisnik vec postoji !")
           }
        }
        catch (error){
           //console.log(error)
-
        }
-}*/
+}
     
     // error check => pravljenjeNaloga( podaci [] )
     const handleSignUp = () =>{
@@ -85,17 +76,6 @@ function SignUp(){
         }
         if(passError || userError ){
 
-           /* Store.addNotification({
-                title: "Warning!",
-                message: "Not all fields are filled",
-                type: "warning",
-                insert: "top",
-                container: "top-center",
-                dismiss: {
-                  duration: 2000,
-                  onScreen: true
-                }
-              });*/
             alert("Nisu popunjena sva potrebna polja")
         }
         // ako je sve ok pravi se nalog i prebacuje nas na main 
@@ -104,10 +84,9 @@ function SignUp(){
         }
         if (userName && passWord  && emailCheck()){
             
-            // pravljenjeNaloga( podaci[] )
-            //console.log(firstName , lastName , userName ,passWord , email, phoneNo)
-            navigate("/Main")
-            //signUP()
+
+            //navigate("/Main")
+            signUP()
 
         }
     }

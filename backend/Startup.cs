@@ -29,6 +29,33 @@ namespace Music_Universe
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddScoped<JwtService>();
+            services.AddCors(options => 
+            {
+               options.AddPolicy("CORS", builder => 
+               {
+                   builder.WithOrigins(new string[]
+                   {
+                       "http://localhost:8080",
+                       "https://localhost:8080",
+                       "http://127.0.0.1:8080",
+                       "https://127.0.0.1:8080",
+                       "http://127.0.0.1:5501",
+                       "http://localhost:5501",
+                       "https://127.0.0.1:5501",
+                       "https://localhost:5501",
+                       "http://localhost:3000",
+                       "https://localhost:3000",
+                       "http://127.0.0.1:3000",
+                       "https://127.0.0.1:3000",
+                   })
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+               });
+
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

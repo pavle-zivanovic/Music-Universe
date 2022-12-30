@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Models;
+using System.IdentityModel.Tokens.Jwt;
 using Neo4jClient;
 using ServiceStack.Redis;
+using Models;
 
 namespace Music_Universe.Controllers
 {
@@ -15,12 +16,15 @@ namespace Music_Universe.Controllers
     public class UserController : ControllerBase
     {
         private readonly IGraphClient neo4j;
+        private readonly JwtService jwtService;
+
         private readonly RedisClient redis = 
         new("redis://default:redispw@localhost:49153");
 
-        public UserController(IGraphClient _neo4j)
+        public UserController(IGraphClient _neo4j, JwtService JwtService)
         {
                 neo4j = _neo4j;
+                jwtService = JwtService;
         }
 
 
@@ -36,7 +40,8 @@ namespace Music_Universe.Controllers
                             .Where( (User n) => n.userName == user.userName  || n.email == user.email)
                             .Return(n => n.As<User>()).ResultsAsync;
 
-            if (korisnik.LastOrDefault() != null){return BadRequest("Korisnik vec postoji");}
+            // Vec postoji
+            if (korisnik.LastOrDefault() != null){return Ok(0);}
 
             
             var noviKorisnik = await neo4j.Cypher.Create("(u:User $u)")
@@ -44,17 +49,17 @@ namespace Music_Universe.Controllers
                                 .Return(u => u.As<User>())
                                 .ResultsAsync;
 
-            
-            return Ok("Napravljen je korisnik !!!");
+            // Success
+            return Ok(1);
         }
 
         // Login and return jwt 
-        [Route("Login/{name}/{pass}")]
-        [HttpGet]
-        public async Task<IActionResult> Login(string name , string pass)
+        [Route("Login")]
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] User korisnik)
         {
             var user = await neo4j.Cypher.Match("(n: User)")
-                                             .Where( (User n) => n.userName == name && n.password == pass)
+                                             .Where( (User n) => n.userName == korisnik.userName && n.password == korisnik.password)
                                              .Return(n => n.As<User>()).ResultsAsync;
 
             
@@ -62,8 +67,10 @@ namespace Music_Universe.Controllers
             {
                 return Ok("1"); // pogresan username ili password 
             }
+
+            var token = jwtService.Generate(user.FirstOrDefault().id);
             
-            return Ok(user.FirstOrDefault());
+            return Ok(token);
         }
 
         [Route("Get users")]
