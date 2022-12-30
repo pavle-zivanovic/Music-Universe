@@ -29,7 +29,9 @@ function ForYou(){
                                     placement="top">
                                 <div className="songCircle"
                                 style={{backgroundImage:'url("../Images/maya.jpg")'}}>
-                                    <div className="innerSongCircle"></div>
+                                    <div className="innerSongCircle">
+                                    <div className="secondInnerSongCircle"></div>
+                                    </div>
                                 </div>
                             </Tooltip>
                         </IconButton>
