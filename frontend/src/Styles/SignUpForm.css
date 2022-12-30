@@ -29,11 +29,13 @@
     display: flex;
     flex-direction: column;
     background-color:rgb(46, 45, 45);
-    width:100%;
-    height: 85%;
+    width:80%;
+    height: 80%;
     /*margin-left: 32.5%;
     margin-right: 32.5%;*/
     margin-top:5%;
+    margin-left: 5%;
+    margin-right: 5%;
     text-align: center;
     border-radius: 10px;
     box-shadow:  0 8px 16px 0 rgb(161,34,161), 0 6px 20px 0 rgb(161,34,161);
@@ -63,21 +65,10 @@
       font-size: 25px;
       margin-top: 20%;
 }
-.inputFirstLastName{
-      display: flex;
-      justify-content: center;
-      margin-top: 5%;
-      margin-bottom: 2.5%;
-      margin-left: 5%;
-      margin-right: 5%;
-      width: 90%;
+.inputUserSignUp{
+    margin-top: 12.5%;
 }
-.inputFirstName , .inputLastName {
-    width: 45%;
-    margin-left: 2.5%;
-    margin-right: 2.5%;
-}
-.inputUserSignUp , .inputPassSignUp , .inputPhoneSignUp , .inputEmailSignUp {
+.inputPassSignUp ,.inputEmailSignUp {
     margin-top: 2.5%;
 }
 .BtnSignUp{
@@ -93,7 +84,8 @@
     background-color: rgb(161,34,161);
     color: aliceblue;
     box-shadow:  0 8px 16px 0 rgb(161,34,161), 0 6px 20px 0 rgb(161,34,161);
-    margin-top: 5%;
+    margin-top: 15%;
+    margin-bottom: 0%;
     margin-left: 7.5%;
     margin-right: 7.5%;
     border-radius: 25px;

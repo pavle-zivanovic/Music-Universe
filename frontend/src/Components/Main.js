@@ -134,10 +134,11 @@ function Main(){
     setOpen(true)
   }
   const handleSubmit = () => {
+    
     alert("Song : "  + songName + "\n" +
           "Singer :" + singerName + "\n" +
           "Album :" + albumName + "\n" +
-          "Release Date :" + releaseDate + "\n" +
+          "Release Date :" + releaseDate.toString() + "\n" +
           "Song Writter :" + songWritter + "\n" +
           "Genre : " + songGenre + "\n" +
           "Lyrics  :" + songLyrics[0] + "\n" 

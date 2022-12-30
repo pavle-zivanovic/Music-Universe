@@ -19,12 +19,14 @@ namespace Models
 
        public string image { get; set; }
 
-       public List<Singer> singers { get; set; }
+       public int streams { get; set; }  
 
-       public Songwriter songWriter { get; set; }
+       //public List<Singer> singers { get; set; }
 
-       public Album album { get; set; }
+       //public Songwriter songWriter { get; set; }
 
-       public List<Rating> ratings { get; set; }
+       //public Album album { get; set; }
+
+       //public List<Rating> ratings { get; set; }
     }
 }

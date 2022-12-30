@@ -46,6 +46,21 @@ namespace Music_Universe.Controllers
             return Ok(singers);
         }
 
+        
+        [Route("Get singer names from neo4j")]
+        [HttpGet]
+        public async Task<IActionResult> GetSingerNameNeo4j()
+        {
+            var singers = await neo4j.Cypher.Match("(n: Singer)")
+                                            .Return(n=> new {
+                                                 ime = n.As<Singer>().name,
+                                                 birthplace = n.As<Singer>().birthplace,                                             
+                                            }).ResultsAsync;
+                                      
+
+            return Ok(singers);
+        }
+
         [Route("Get singers from redis")]
         [HttpGet]
         public string GetSingerRedis()

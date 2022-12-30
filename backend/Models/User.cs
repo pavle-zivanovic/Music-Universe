@@ -13,6 +13,6 @@ namespace Models
 
        public string email { get; set; }
 
-       public List<Rating> ratings { get; set; }
+       //public List<Rating> ratings { get; set; }
     }
 }

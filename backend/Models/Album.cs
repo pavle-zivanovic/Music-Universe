@@ -13,8 +13,8 @@ namespace Models
 
        public string cover { get; set; }
 
-       public List<Song> songs { get; set; }
+       //public List<Song> songs { get; set; }
 
-       public List<Singer> singer { get; set; }
+       //public List<Singer> singer { get; set; }
     }
 }

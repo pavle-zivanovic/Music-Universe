@@ -22,20 +22,12 @@ function SignUp(){
     const [passError , setPassError] = useState(false)
     const [email , setEmail] = useState('')
     const [emailError , setEmailError] = useState(false)
-    const [firstName , setFirstName] = useState('')
-    const [fnameError , setFnameError] = useState(false)
-    const [lastName , setLastName] = useState('')
-    const [lnameError , setLnameError] = useState(false)
-    const [phoneNo , setPhoneNo] = useState('')
-
-    // nije potrebno polje tako da ne mora error handle
-    const [phoneError , setPhoneError] = useState(false)
 
     //const darkMode = (JSON.parse(window.localStorage.getItem('darkMode')));
     const darkMode = true 
     document.body.style.backgroundColor = darkMode ? "rgb(15, 6, 25)" :"azure";
 
-    async function signUP(){
+   /* async function signUP(){
 
         const user = {
             korisnickoIme: userName,
@@ -74,19 +66,14 @@ function SignUp(){
           //console.log(error)
 
        }
-}
+}*/
     
     // error check => pravljenjeNaloga( podaci [] )
     const handleSignUp = () =>{
 
-        setEmailError(false);setFnameError(false);setUserError(false);setLnameError(false);setPassError(false);
+        setEmailError(false);;setUserError(false);;setPassError(false);
 
-        if ( firstName === ''){
-            setFnameError(true)
-        }
-        if (lastName === ''){
-            setLnameError(true)
-        }
+
         if (userName === ''){
             setUserError(true)
         }
@@ -96,8 +83,9 @@ function SignUp(){
         if (email === ''){
             setEmailError(true)           
         }
-        if(passError || userError || lnameError || fnameError){
-            Store.addNotification({
+        if(passError || userError ){
+
+           /* Store.addNotification({
                 title: "Warning!",
                 message: "Not all fields are filled",
                 type: "warning",
@@ -107,19 +95,19 @@ function SignUp(){
                   duration: 2000,
                   onScreen: true
                 }
-              });
-            //alert("Nisu popunjena sva potrebna polja")
+              });*/
+            alert("Nisu popunjena sva potrebna polja")
         }
         // ako je sve ok pravi se nalog i prebacuje nas na main 
         if(!emailCheck()){
             alert("Nevalidan email")
         }
-        if (firstName && lastName && userName && passWord  && emailCheck()){
+        if (userName && passWord  && emailCheck()){
             
             // pravljenjeNaloga( podaci[] )
             //console.log(firstName , lastName , userName ,passWord , email, phoneNo)
-
-            signUP()
+            navigate("/Main")
+            //signUP()
 
         }
     }
@@ -161,17 +149,6 @@ function SignUp(){
                     <div className="divSignUpText"> 
                         <label className="naslov"> SIGN UP</label>
                     </div>
-
-                    <div className="inputFirstLastName">
-                        <div className="inputFirstName">                           
-                                <TextField onChange={ (e) => setFirstName(e.target.value) } error={fnameError}
-                                id="outlined-basic1" label="First Name" inputProps={{ style: { fontFamily: 'Arial', color: darkMode ? 'white':'black'}}} InputLabelProps={{ style : { color : darkMode ? "white":"rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" required sx= {{ width : "100%"}}/>                            
-                        </div>
-                        <div className="inputLastName">                            
-                                <TextField onChange={ (e) => setLastName(e.target.value) } error={lnameError}
-                                id="outlined-basic2" label="Last Name" inputProps={{ style: { fontFamily: 'Arial', color: darkMode ? 'white':'black'}}} InputLabelProps={{ style : { color : darkMode ? "white":"rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" required sx ={{ width : "100%"}}/>                          
-                        </div>
-                    </div>
                     <div className="inputUserSignUp">                          
                                 <TextField onChange={ (e) => setUserName(e.target.value) } error={userError}
                                 id="outlined-basic3" label="Username" inputProps={{ style: { fontFamily: 'Arial', color: darkMode ? 'white':'black'}}} InputLabelProps={{ style : { color : darkMode ? "white":"rgb(0, 100, 100)"}}} variant="outlined" type="text" color="primary" required sx ={{ width: "85%"  }}/>                             
@@ -183,10 +160,6 @@ function SignUp(){
                     <div className="inputEmailSignUp">
                                 <TextField onChange={ (e) => setEmail(e.target.value) } error={emailError}
                                 id="outlined-basic5" label="Email" inputProps={{ style: { fontFamily: 'Arial', color: darkMode ? 'white':'black'}}} InputLabelProps={{ style : { color : darkMode ? "white":"rgb(0, 100, 100)"}}} variant="outlined" type="email" color="primary" required sx ={{ width: "85%"  }}/>                            
-                    </div>
-                    <div className="inputPhoneSignUp">                         
-                            <TextField onChange={ (e) => setPhoneNo(e.target.value) } 
-                            id="outlined-basic6" label="Phone Number" inputProps={{ style: { fontFamily: 'Arial', color: darkMode ? 'white':'black'}}} InputLabelProps={{ style : { color : darkMode ? "white":"rgb(0, 100, 100)"}}} variant="outlined" type="number" color="primary" sx ={{ width: "85%"  }}/>                             
                     </div>
                     <button onClick={(event) => { event.preventDefault() ; handleSignUp(); } } className="BtnSignUp">CREATE ACCOUNT</button>
                 </div>
