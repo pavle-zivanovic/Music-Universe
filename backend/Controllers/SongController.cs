@@ -31,7 +31,7 @@ namespace Music_Universe.Controllers
         // Radi  ali bez provera  bice zavrseno na kraju
         [Route("Add Song/jwt")]
         [HttpPost]
-        public async Task<IActionResult> SignUp([FromBody] Song song , string jwt)
+        public async Task<IActionResult> AddSong([FromBody] Song song , string jwt , int pevacID , int albumID , int songwriterID)
         {
             
             var token = jwtService.Verify(jwt);
@@ -41,17 +41,58 @@ namespace Music_Universe.Controllers
             if (song.title == "" || song.genre == "" || song.year == 0 || song.lyrics == ""){return BadRequest("Nisu popunjena sva polja !");}
 
             var pesmaja = await neo4j.Cypher.Match("(n: Song)")
-                            .Where( (Song n) => n.title == song.title)
-                            .Return(n => n.As<User>()).ResultsAsync;
+                                .Where( (Song n) => n.title == song.title)
+                                .Return(n => n.As<Song>()).ResultsAsync;
 
             // Vec postoji
             if (pesmaja.LastOrDefault() != null){return Ok(0);}
-
-            
+      
             var newSong = await neo4j.Cypher.Create("(u:Song $u)")
                                 .WithParam("u", song)
-                                .Return(u => u.As<Song>())
+                                .Set("u.id = id(u)")
+                                .Return(u => u.As<Song>().id)
                                 .ResultsAsync;
+
+            // provera Singer-a
+            var pevaljka = await neo4j.Cypher.Match("(s: Singer)")
+                                .Where(( Singer s) => s.id == pevacID)
+                                .Return( s => s.As<Singer>()).ResultsAsync;
+
+            if ( pevaljka.LastOrDefault() == null){return BadRequest("Nepostojeca pevaljka");}
+
+            await neo4j.Cypher.Match("(a:Singer), (b:Song)")
+                                .Where((Singer a, Song b) => a.id == pevacID && b.id == newSong.LastOrDefault())
+                                .Create("(a)-[r:sings]->(b)")
+                                .ExecuteWithoutResultsAsync();
+
+
+            // provera Songwriter-a
+            var pisacTexta = await neo4j.Cypher.Match("(s: Songwriter)")
+                                .Where(( Songwriter s) => s.id == songwriterID)
+                                .Return( s => s.As<Songwriter>()).ResultsAsync;
+
+            if ( pisacTexta.LastOrDefault() == null){return BadRequest("Nepostojeci tekstopisac");}
+
+            await neo4j.Cypher.Match("(a:Songwriter), (b:Song)")
+                                .Where((Songwriter a, Song b) => a.id == songwriterID && b.id == newSong.LastOrDefault())
+                                .Create("(a)-[r:writes]->(b)")
+                                .ExecuteWithoutResultsAsync();
+
+
+            // provera Albuma-a
+            if ( albumID == -1){return Ok(newSong.LastOrDefault());} 
+
+            var albumce = await neo4j.Cypher.Match("(s: Album)")
+                                .Where(( Album s) => s.id == albumID)
+                                .Return( s => s.As<Album>()).ResultsAsync;
+
+            if ( albumce.LastOrDefault() == null){return BadRequest("Nepostojeci album");}
+
+            await neo4j.Cypher.Match("(a:Album), (b:Song)")
+                                .Where((Album a, Song b) => a.id == albumID && b.id == newSong.LastOrDefault())
+                                .Create("(a)-[r:contatins]->(b)")
+                                .ExecuteWithoutResultsAsync();
+
 
             // Success
             return Ok(1);
@@ -70,14 +111,15 @@ namespace Music_Universe.Controllers
 
             var albumce = await neo4j.Cypher.Match("(a: Album)")
                             .Where( (Album a) => a.title == album.title && a.year == album.year)
-                            .Return(a => a.As<User>()).ResultsAsync;
+                            .Return(a => a.As<Album>()).ResultsAsync;
 
             // Vec postoji
             if (albumce.LastOrDefault() != null){return Ok(0);}
 
-            
+             
             var newAlbum = await neo4j.Cypher.Create("(a:Album $a)")
                                 .WithParam("a", album)
+                                .Set("a.id = id(a)")
                                 .Return(a => a.As<Album>())
                                 .ResultsAsync;
 

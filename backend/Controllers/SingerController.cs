@@ -50,6 +50,7 @@ namespace Music_Universe.Controllers
             
             var newSinger = await neo4j.Cypher.Create("(s:Singer $s)")
                                 .WithParam("s", singer)
+                                .Set("s.id = id(s)")
                                 .Return(s => s.As<Singer>())
                                 .ResultsAsync;
 
@@ -80,8 +81,9 @@ namespace Music_Universe.Controllers
             if (songWriter.LastOrDefault() != null){return Ok(0);}
 
             
-            var newSongwritter = await neo4j.Cypher.Create("(s:Singer $s)")
+            var newSongwritter = await neo4j.Cypher.Create("(s:Songwriter $s)")
                                 .WithParam("s", songwriter)
+                                .Set("s.id = id(s)")
                                 .Return(s => s.As<Songwriter>())
                                 .ResultsAsync;
 
