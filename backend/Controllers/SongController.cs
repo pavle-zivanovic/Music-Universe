@@ -85,16 +85,60 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-        [Route("Vrati pesme")]
+        [Route("Get songs for Featured")]
         [HttpGet]
-        public async Task<IActionResult> GetSongs()
+        public async Task<IActionResult> GetSongsFeatured()
         {
-            var songs = await neo4j.Cypher.Match("(n: Song)")
-                                             .Return(n => n.As<Song>())
-                                             .Limit(100)
-                                             .ResultsAsync;
+            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sing]-(s:Singer)")
+                                            .Return((n, s) => new 
+                                            {
+                                                Song = n.As<Song>(),
+                                                singerName = s.As<Singer>().name
+                                            })
+                                            .Limit(100)
+                                            .ResultsAsync;
 
             return Ok(songs);
+        }
+
+
+        [Route("Get songs for ForYou/{userID}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSongsForYou(int userID)
+        {
+            if(userID < 0)
+            {
+                return BadRequest("Nevalidan id!");
+            }
+
+            var songs = await neo4j.Cypher.Match("(user: User)-[r1:isLiked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sing]-(singer:Singer)")
+                                          .Where((User user) => user.id == userID)
+                                          .Return((singer, song) => new 
+                                            {
+                                                Song = song.As<Song>(),
+                                                singerName = singer.As<Singer>().name
+                                            })
+                                          .ResultsAsync;
+
+            return Ok(songs);
+        }
+
+        [Route("Increase the number of plays/{songID}")]
+        [HttpPut]
+        public async Task<IActionResult> IncreasePlaysNumber(int songID)
+        {
+            if(songID < 0)
+            {
+                return BadRequest("Nevalidan id!");
+            }
+
+            var streams = await neo4j.Cypher.Match("(s: Song)")
+                              .Where((Song s) => s.id == songID)
+                              .Set("s.streams = s.streams+1")
+                              .Return(s => s.As<Song>().streams)
+                              .ResultsAsync;
+
+            return Ok(streams);
         }
     }
 }

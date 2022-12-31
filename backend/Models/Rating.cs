@@ -5,6 +5,8 @@ namespace Models
 {
     public class Rating
     {
+        public int id { get; set; }
+        
         //public User user { get; set; }
 
         //public Song song { get; set; }
