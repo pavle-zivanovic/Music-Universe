@@ -134,7 +134,41 @@ function Main(){
     setOpen(true)
   }
   const handleSubmit = () => {
-    
+
+    setNameError(false);;setSingerError(false);setGenreError(false);setLyricsError(false);setAlbumError(false);setWritterError(false);
+    setDateError(false);setSongFileError(false);setCoverImageError(false);
+
+
+    if (songName === ''){
+        setNameError(true)
+    }
+    if (singerName === ''){
+        setSingerError(true)
+    }
+    if (songGenre === ''){
+        setGenreError(true)           
+    }
+    if (songLyrics === ''){
+      setLyricsError(true)           
+    }
+    if (songWritter === ''){
+      setWritterError(true)           
+    }
+    if (releaseDate === ''){
+      setDateError(true)           
+    }
+    if (songFile === ''){
+      setSongFileError(true)           
+    }
+    if(nameError ||  singerError || genreError || lyricsError || writterError || dateError || songFileError){
+
+        alert("Nisu popunjena sva potrebna polja")
+    }
+    if (songName && singerName  && songGenre && songLyrics && songWritter && releaseDate && songFile){
+        
+        addSong()
+
+    }
     alert("Song : "  + songName + "\n" +
           "Singer :" + singerName + "\n" +
           "Album :" + albumName + "\n" +
@@ -144,6 +178,62 @@ function Main(){
           "Lyrics  :" + songLyrics[0] + "\n" 
     )
     setOpen(false)
+  }
+
+  async function addSong(){
+
+
+    const token = (JSON.parse(window.localStorage.getItem('user-info')));
+
+
+    let rezPevac = await fetch("https://localhost:5001/Singer/GetSinger/" + singerName,{
+      method : 'GET',
+      headers : {
+        'Content-Type' : 'aplication/json; charset=utf-8',
+        'Accept' : 'aplication/json; charset=utf-8',
+      }
+    });
+    let pevac = await rezPevac.json();
+
+    let rezAlbum = await fetch("https://localhost:5001/Song/GetAlbum/" + albumName,{
+      method : 'GET',
+      headers : {
+        'Content-Type' : 'aplication/json; charset=utf-8',
+        'Accept' : 'aplication/json; charset=utf-8',
+      }
+    });
+    let album = await rezAlbum.json();
+    if (album == null){album = -1;}
+
+    let rezTekstopisac = await fetch("https://localhost:5001/Singer/GetSongwriter/" + songWritter,{
+      method : 'GET',
+      headers : {
+        'Content-Type' : 'aplication/json; charset=utf-8',
+        'Accept' : 'aplication/json; charset=utf-8',
+      }
+    });
+    let tekstopisac = await rezTekstopisac.json();    
+
+    const song = {
+      title : songName,
+      lyrics : songLyrics,
+      year : releaseDate,
+      genre : songGenre,
+      song : songFile,
+      image : coverImage,
+      streams : 0 ,
+    };
+    console.log(user);
+    let result = await fetch("https://localhost:5001/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
+      method : 'POST',
+      headers : {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json; charset=utf-8',
+      },
+      body : JSON.stringify(song)
+    });
+
+    let a = await result.json(); 
   }
 
   const renderMobileMenuRight = (

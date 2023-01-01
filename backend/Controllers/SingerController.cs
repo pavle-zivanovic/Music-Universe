@@ -128,5 +128,35 @@ namespace Music_Universe.Controllers
 
             return singer;
         }
+
+
+        [Route("GetSinger/{singerName}")]
+        [HttpPut]
+        public async Task<IActionResult> GetSinger(string singerName)
+        {
+            if(singerName == "") {return BadRequest("Nevalidan id!");}
+
+            var singer = await neo4j.Cypher.Match("(s: Singer)")
+                              .Where((Singer s) => s.name == singerName)
+                              .Return(s => s.As<Singer>().id)
+                              .ResultsAsync;
+
+            return Ok(singer);
+        }
+
+
+        [Route("GetSongwritter/{songwriterName}")]
+        [HttpPut]
+        public async Task<IActionResult> GetSongwritter(string songwriterName)
+        {
+            if(songwriterName == "") {return BadRequest("Nevalidan id!");}
+
+            var songwriter = await neo4j.Cypher.Match("(s: Songwriter)")
+                              .Where((Songwriter s) => s.name == songwriterName)
+                              .Return(s => s.As<Songwriter>().id)
+                              .ResultsAsync;
+
+            return Ok(songwriter);
+        }
     }
 }

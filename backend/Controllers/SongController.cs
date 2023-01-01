@@ -29,7 +29,7 @@ namespace Music_Universe.Controllers
 
         // Create Song entity
         // Radi  ali bez provera  bice zavrseno na kraju
-        [Route("Add Song/jwt")]
+        [Route("Add Song/{jwt}/{pevacID}/{albumID}/{songwriterID}")]
         [HttpPost]
         public async Task<IActionResult> AddSong([FromBody] Song song , string jwt , int pevacID , int albumID , int songwriterID)
         {
@@ -182,5 +182,21 @@ namespace Music_Universe.Controllers
 
             return Ok(streams);
         }
+
+
+        [Route("GetAlbum/{albumName}")]
+        [HttpPut]
+        public async Task<IActionResult> GetAlbum(string albumName)
+        {
+            if(albumName == "") {return BadRequest("Nevalidan id!");}
+
+            var album = await neo4j.Cypher.Match("(a: Album)")
+                              .Where((Album a) => a.title == albumName)
+                              .Return(a => a.As<Album>().id)
+                              .ResultsAsync;
+
+            return Ok(album);
+        }
+
     }
 }
