@@ -32,6 +32,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { FormControlLabel, TextField } from "@mui/material";
 import FileUpload from "react-mui-fileuploader"
+import Artist from './Artist';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -223,7 +224,7 @@ function Main(){
       image : coverImage,
       streams : 0 ,
     };
-    console.log(user);
+    //console.log(user);
     let result = await fetch("https://localhost:5001/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
       method : 'POST',
       headers : {
@@ -510,6 +511,7 @@ function Main(){
                 <Route path="" element={<Featured />} />
                 <Route path="foryou" element={<ForYou />} />
                 <Route path="charts" element={<Charts />} />
+                <Route path="artist" element={<Artist />} />
                 <Route path="/*" element={<LoginForm />} />
             </Routes>
       </div>
