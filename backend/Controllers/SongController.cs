@@ -29,7 +29,7 @@ namespace Music_Universe.Controllers
 
         // Create Song entity
         // Radi  ali bez provera  bice zavrseno na kraju
-        [Route("Add Song/{jwt}/{pevacID}/{albumID}/{songwriterID}")]
+        [Route("AddSong/{jwt}/{pevacID}/{albumID}/{songwriterID}")]
         [HttpPost]
         public async Task<IActionResult> AddSong([FromBody] Song song , string jwt , int pevacID , int albumID , int songwriterID)
         {
@@ -53,6 +53,8 @@ namespace Music_Universe.Controllers
                                 .Return(u => u.As<Song>().id)
                                 .ResultsAsync;
 
+            int songID = newSong.LastOrDefault();
+
             // provera Singer-a
             var pevaljka = await neo4j.Cypher.Match("(s: Singer)")
                                 .Where(( Singer s) => s.id == pevacID)
@@ -61,7 +63,7 @@ namespace Music_Universe.Controllers
             if ( pevaljka.LastOrDefault() == null){return BadRequest("Nepostojeca pevaljka");}
 
             await neo4j.Cypher.Match("(a:Singer), (b:Song)")
-                                .Where((Singer a, Song b) => a.id == pevacID && b.id == newSong.LastOrDefault())
+                                .Where((Singer a, Song b) => a.id == pevacID && b.id == songID)
                                 .Create("(a)-[r:sings]->(b)")
                                 .ExecuteWithoutResultsAsync();
 
@@ -74,7 +76,7 @@ namespace Music_Universe.Controllers
             if ( pisacTexta.LastOrDefault() == null){return BadRequest("Nepostojeci tekstopisac");}
 
             await neo4j.Cypher.Match("(a:Songwriter), (b:Song)")
-                                .Where((Songwriter a, Song b) => a.id == songwriterID && b.id == newSong.LastOrDefault())
+                                .Where((Songwriter a, Song b) => a.id == songwriterID && b.id == songID)
                                 .Create("(a)-[r:writes]->(b)")
                                 .ExecuteWithoutResultsAsync();
 
@@ -89,7 +91,7 @@ namespace Music_Universe.Controllers
             if ( albumce.LastOrDefault() == null){return BadRequest("Nepostojeci album");}
 
             await neo4j.Cypher.Match("(a:Album), (b:Song)")
-                                .Where((Album a, Song b) => a.id == albumID && b.id == newSong.LastOrDefault())
+                                .Where((Album a, Song b) => a.id == albumID && b.id == songID)
                                 .Create("(a)-[r:contatins]->(b)")
                                 .ExecuteWithoutResultsAsync();
 
@@ -98,7 +100,7 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
         // Create Album entity
-        [Route("Add Album/jwt")]
+        [Route("AddAlbum/jwt")]
         [HttpPost]
         public async Task<IActionResult> AddAlbum([FromBody] Album album, string jwt)
         {
@@ -127,11 +129,11 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-        [Route("Get songs for Featured")]
+        [Route("GetSongsFeatured")]
         [HttpGet]
         public async Task<IActionResult> GetSongsFeatured()
         {
-            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sing]-(s:Singer)")
+            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sings]-(s:Singer)")
                                             .Return((n, s) => new 
                                             {
                                                 Song = n.As<Song>(),
@@ -144,7 +146,7 @@ namespace Music_Universe.Controllers
         }
 
 
-        [Route("Get songs for ForYou/{userID}")]
+        [Route("GetSongsForYou/{userID}")]
         [HttpGet]
         public async Task<IActionResult> GetSongsForYou(int userID)
         {
@@ -153,7 +155,7 @@ namespace Music_Universe.Controllers
                 return BadRequest("Nevalidan id!");
             }
 
-            var songs = await neo4j.Cypher.Match("(user: User)-[r1:isLiked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sing]-(singer:Singer)")
+            var songs = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
                                           .Where((User user) => user.id == userID)
                                           .Return((singer, song) => new 
                                             {
@@ -165,7 +167,7 @@ namespace Music_Universe.Controllers
             return Ok(songs);
         }
 
-        [Route("Increase the number of plays/{songID}")]
+        [Route("IncreasePlaysNumber/{songID}")]
         [HttpPut]
         public async Task<IActionResult> IncreasePlaysNumber(int songID)
         {
@@ -185,7 +187,7 @@ namespace Music_Universe.Controllers
 
 
         [Route("GetAlbum/{albumName}")]
-        [HttpPut]
+        [HttpGet]
         public async Task<IActionResult> GetAlbum(string albumName)
         {
             if(albumName == "") {return BadRequest("Nevalidan id!");}

@@ -29,7 +29,7 @@ namespace Music_Universe.Controllers
 
 
         // Create User entity
-        [Route("Sign Up")]
+        [Route("SignUp")]
         [HttpPost]
         public async Task<IActionResult> SignUp([FromBody] User user)
         {
@@ -73,7 +73,7 @@ namespace Music_Universe.Controllers
             return Ok(token);
         }
 
-        [Route("Get users")]
+        [Route("Getusers")]
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {

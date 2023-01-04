@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import '../Styles/Featured.css';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -17,15 +17,13 @@ function Featured(){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-
-        fetch("http://localhost:5001/Song/GetSongsFeatured/",
+        fetch("Song/GetSongsFeatured/",
         {
             method:"GET",
             headers: {
                 'Content-Type': 'application/json',
             },
-        }).then(res => {
-            res.json()
+        }).then(res => { res.json()
             .then(data => {
                 console.log(data);
                 setSongs(data);
@@ -50,27 +48,28 @@ function Featured1({songs}){
                 marginBottom:"2%" }}>
             <Grid container spacing={2}>
                 {songs.map((song) => (
-                    <Grid key={song} 
-                    xs={4} sm={3} md={2}>
-                        <IconButton onClick={() => {alert("Klikić");}}>
-                            <Tooltip title="Maya Berovic"
-                                    placement="top">
-                                <div className="songCircle"
-                                style={{backgroundImage:'url("../Images/maya.jpg")'}}>
-                                    <div className="innerSongCircle">
-                                        <div className="secondInnerSongCircle"></div>
+                    <React.Fragment key={song.song.id}>
+                        <Grid xs={4} sm={3} md={2}>
+                            <IconButton onClick={() => {alert("Klikić");}}>
+                                <Tooltip title={song.singerName}
+                                        placement="top">
+                                    <div className="songCircle"
+                                    style={{backgroundImage:'url(' + song.song.image + ')'}}>
+                                        <div className="innerSongCircle">
+                                            <div className="secondInnerSongCircle"></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </Tooltip>
-                        </IconButton>
-                        <div 
-                        style={{color:"white",
-                               position:"relative",
-                               left:"14%",
-                               top:"6%"}}>
-                            {song}
-                        </div>
-                    </Grid>
+                                </Tooltip>
+                            </IconButton>
+                            <div 
+                            style={{color:"white",
+                                position:"relative",
+                                left:"15%",
+                                top:"6%"}}>
+                                {song.song.title}
+                            </div>
+                        </Grid>
+                    </React.Fragment>
                 ))}
             </Grid>
         </Box>

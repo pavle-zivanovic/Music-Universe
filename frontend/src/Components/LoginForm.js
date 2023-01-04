@@ -39,7 +39,7 @@ function LoginForm()  {
         password : password,
       };
       console.log(user);
-      let result = await fetch("https://localhost:5001/User/Login/", {
+      let result = await fetch("User/Login/", {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json; charset=utf-8',

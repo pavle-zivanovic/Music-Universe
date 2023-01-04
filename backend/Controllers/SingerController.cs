@@ -28,7 +28,7 @@ namespace Music_Universe.Controllers
         }
 
         // Create Singer entity
-        [Route("Add Singer/jwt")]
+        [Route("AddSinger/jwt")]
         [HttpPost]
         public async Task<IActionResult> AddSinger([FromBody] Singer singer, string jwt)
         {
@@ -60,7 +60,7 @@ namespace Music_Universe.Controllers
 
 
         // Create Singer entity
-        [Route("Add Songwritter/jwt")]
+        [Route("AddSongWritter/jwt")]
         [HttpPost]
         public async Task<IActionResult> AddSongWritter([FromBody] Songwriter songwriter,string jwt)
         {
@@ -91,47 +91,8 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-
-        [Route("Get singers from neo4j")]
-        [HttpGet]
-        public async Task<IActionResult> GetSingerNeo4j()
-        {
-            var singers = await neo4j.Cypher.Match("(n: Singer)")
-                                             .Return(n => new 
-                                             {
-                                               Singer = n.As<Singer>()
-                                             }).ResultsAsync;
-
-            return Ok(singers);
-        }
-
-        
-        [Route("Get singer names from neo4j")]
-        [HttpGet]
-        public async Task<IActionResult> GetSingerNameNeo4j()
-        {
-            var singers = await neo4j.Cypher.Match("(n: Singer)")
-                                            .Return(n=> new {
-                                                 ime = n.As<Singer>().name,
-                                                 birthplace = n.As<Singer>().birthplace,                                             
-                                            }).ResultsAsync;
-                                      
-
-            return Ok(singers);
-        }
-
-        [Route("Get singers from redis")]
-        [HttpGet]
-        public string GetSingerRedis()
-        {
-            var singer = redis.Get<string>("name");
-
-            return singer;
-        }
-
-
         [Route("GetSinger/{singerName}")]
-        [HttpPut]
+        [HttpGet]
         public async Task<IActionResult> GetSinger(string singerName)
         {
             if(singerName == "") {return BadRequest("Nevalidan id!");}
@@ -146,7 +107,7 @@ namespace Music_Universe.Controllers
 
 
         [Route("GetSongwritter/{songwriterName}")]
-        [HttpPut]
+        [HttpGet]
         public async Task<IActionResult> GetSongwritter(string songwriterName)
         {
             if(songwriterName == "") {return BadRequest("Nevalidan id!");}

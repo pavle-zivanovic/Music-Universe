@@ -187,7 +187,7 @@ function Main(){
     const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 
-    let rezPevac = await fetch("https://localhost:5001/Singer/GetSinger/" + singerName,{
+    let rezPevac = await fetch("Singer/GetSinger/" + singerName,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -196,7 +196,7 @@ function Main(){
     });
     let pevac = await rezPevac.json();
 
-    let rezAlbum = await fetch("https://localhost:5001/Song/GetAlbum/" + albumName,{
+    let rezAlbum = await fetch("Song/GetAlbum/" + albumName,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -206,7 +206,7 @@ function Main(){
     let album = await rezAlbum.json();
     if (album == null){album = -1;}
 
-    let rezTekstopisac = await fetch("https://localhost:5001/Singer/GetSongwriter/" + songWritter,{
+    let rezTekstopisac = await fetch("Singer/GetSongwriter/" + songWritter,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -225,7 +225,7 @@ function Main(){
       streams : 0 ,
     };
     //console.log(user);
-    let result = await fetch("https://localhost:5001/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
+    let result = await fetch("Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
       method : 'POST',
       headers : {
         'Content-Type': 'application/json; charset=utf-8',
