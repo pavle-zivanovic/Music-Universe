@@ -223,7 +223,7 @@ function Main(){
       image : coverImage,
       streams : 0 ,
     };
-    console.log(user);
+    //console.log(user);
     let result = await fetch("https://localhost:5001/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
       method : 'POST',
       headers : {
