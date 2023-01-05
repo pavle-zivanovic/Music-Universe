@@ -1,14 +1,7 @@
-import React, { Component, useState }  from "react";
-import Checkbox from '@mui/material/Checkbox';
-import { pink , orange } from "@mui/material/colors";
-import { FormControlLabel, TextField } from "@mui/material";
-import {ThemeProvider} from "@mui/system";
-import { createTheme , experimental_sx as sx} from "@mui/material/styles"
+import React, { useState }  from "react";
+import { TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { ClassNames } from "@emotion/react";
-import { Password } from "@mui/icons-material";
 import Grid from '@mui/material/Grid';
-import { Store } from 'react-notifications-component';
 import '../Styles/SignUpForm.css';
 
 function SignUp(){

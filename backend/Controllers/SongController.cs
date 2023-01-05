@@ -156,7 +156,7 @@ namespace Music_Universe.Controllers
             }
 
             var songs = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
-                                          .Where((User user) => user.id == userID)
+                                          .Where((User user, Rating rating) => user.id == userID && rating.like == true)
                                           .Return((singer, song) => new 
                                             {
                                                 Song = song.As<Song>(),
@@ -166,6 +166,7 @@ namespace Music_Universe.Controllers
 
             return Ok(songs);
         }
+
 
         [Route("IncreasePlaysNumber/{songID}")]
         [HttpPut]
@@ -200,5 +201,27 @@ namespace Music_Universe.Controllers
             return Ok(album);
         }
 
+
+        [Route("LikeTheSong/{userID}/{songID}")]
+        [HttpPut]
+        public async Task<IActionResult> LikeTheSong(int userID, int songID)
+        {
+            if(userID < 0) 
+            {
+                return BadRequest("Nevalidan id korisnika!");
+            }
+
+            if(songID < 0)
+            {
+                return BadRequest("Nevalidan id pesme!");
+            }
+
+            await neo4j.Cypher.Match("(u:User)-[rel1:Liked]->(r:Rating)<-[rel2:Has]-(s:Song)")
+                              .Where((User u, Song s) => u.id == userID && s.id == songID)
+                              .Set("r.like = true")
+                              .ExecuteWithoutResultsAsync();
+
+            return Ok("Uspesno");
+        }
     }
 }

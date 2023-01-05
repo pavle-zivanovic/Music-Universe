@@ -46,9 +46,22 @@ namespace Music_Universe.Controllers
             
             var noviKorisnik = await neo4j.Cypher.Create("(u:User $u)")
                                 .WithParam("u", user)
-                                .Return(u => u.As<User>())
+                                .Set("u.id = id(u)")
+                                .Return(u => u.As<User>().id)
                                 .ResultsAsync;
 
+            var noviKorisnikID = noviKorisnik.LastOrDefault();
+
+            var like = false;
+            Dictionary<string, object> ratingDict = new Dictionary<string, object>();
+            ratingDict.Add("like", like);
+
+            await neo4j.Cypher.Match("(u:User), (s:Song)")
+                              .Where((User u) => u.id == noviKorisnikID)
+                              .Create("(u)-[rel:Liked]->(rating: Rating $rating)<-[r:Has]-(s)")
+                              .WithParam("rating", ratingDict)
+                              .Set("rating.id = id(rating)")
+                              .ExecuteWithoutResultsAsync();
             // Success
             return Ok(1);
         }

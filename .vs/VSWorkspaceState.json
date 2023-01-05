@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\frontend",
+    "\\frontend\\src",
+    "\\frontend\\src\\Components"
   ],
+  "SelectedNode": "\\frontend\\src\\Components\\LoginForm.js",
   "PreviewInSolutionExplorer": false
 }

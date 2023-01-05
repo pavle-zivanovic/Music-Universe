@@ -20,18 +20,15 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Featured from './Featured';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BrowserRouter ,Route ,Routes, Navigate} from "react-router-dom";
+import { Route ,Routes } from "react-router-dom";
 import LoginForm from './LoginForm';
 import ForYou from './ForYou';
 import Charts from './Charts';
-import { SettingsPowerRounded } from '@mui/icons-material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { FormControlLabel, TextField } from "@mui/material";
-import FileUpload from "react-mui-fileuploader"
+import { TextField } from "@mui/material";
 import Artist from './Artist';
 
 
@@ -99,7 +96,7 @@ function Main(){
   const [mobileOpenRight, setMobileOpenRight] = React.useState(null);
   const isMobileMenuOpenRight = Boolean(mobileOpenRight);
   const [open, setOpen] = React.useState(false)
-  const [songID, setSongID] = React.useState(null);
+  //const [songID, setSongID] = React.useState(null);
   const [songName , setSongName] = React.useState('');
   const [singerName , setSingerName] = React.useState('');
   const [albumName , setAlbumName] = React.useState('');
@@ -189,7 +186,7 @@ function Main(){
     const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 
-    let rezPevac = await fetch("Singer/GetSinger/"+singerName,{
+    let rezPevac = await fetch("/Singer/GetSinger/"+singerName,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -199,7 +196,7 @@ function Main(){
     let pevac = await rezPevac.json();
  
     
-    let rezAlbum = await fetch("Song/GetAlbum/" + albumName,{
+    let rezAlbum = await fetch("/Song/GetAlbum/" + albumName,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -209,7 +206,7 @@ function Main(){
     let album = await rezAlbum.json();
     if (album == null){album = -1;}
 
-    let rezTekstopisac = await fetch("Singer/GetSongwriter/" + songWritter,{
+    let rezTekstopisac = await fetch("/Singer/GetSongwriter/" + songWritter,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -228,7 +225,7 @@ function Main(){
       streams : 0 ,
     };
     console.log(song);
-    let result = await fetch("Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
+    let result = await fetch("/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
       method : 'POST',
       headers : {
         'Content-Type': 'application/json; charset=utf-8',
@@ -237,7 +234,7 @@ function Main(){
       body : JSON.stringify(song)
     });
 
-    let a = await result.json(); 
+    //let a = await result.json(); 
   }
 
   const renderMobileMenuRight = (
@@ -322,7 +319,7 @@ function Main(){
                 aria-label="open drawer"
                 sx={{ mr: 2, 
                 color:"rgb(15, 6, 26)"}}
-                
+                onClick={handleMobileMenuOpenLeft}
               >
                 <MenuIcon />
               </IconButton>

@@ -1,14 +1,7 @@
-import React, { Component, useState , useEffect}   from "react";
-import Checkbox from '@mui/material/Checkbox';
-import { pink , orange } from "@mui/material/colors";
-import { CssBaseline, FormControlLabel, TextField } from "@mui/material";
-import {ThemeProvider} from "@mui/system";
-import { createTheme , experimental_sx as sx} from "@mui/material/styles"
-import { json, useNavigate} from "react-router-dom";
+import React, { useState , useEffect}   from "react";
+import { CssBaseline, TextField } from "@mui/material";
+import { useNavigate} from "react-router-dom";
 import Grid from '@mui/material/Grid';
-import { Switch } from "@mui/material";
-import { Paper } from "@mui/material";
-import { Store } from 'react-notifications-component';
 import '../Styles/LoginForm.css';
 
 
@@ -24,7 +17,7 @@ function LoginForm()  {
     const darkMode = true
     document.body.style.backgroundColor = darkMode ? "rgb(15, 6, 25)" :"azure";
 
-    const history = useNavigate();
+    //const history = useNavigate();
     useEffect(() => {
       if(localStorage.getItem('user-info')){
         navigate("/Main")
@@ -51,7 +44,7 @@ function LoginForm()  {
       let a = await result.json(); 
       //console.log(a.token);        
       localStorage.setItem('user-info',JSON.stringify(a.token));
-      const token = (JSON.parse(window.localStorage.getItem('user-info')));
+      //const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
       if ( a != null){
         navigate("/Main");
@@ -81,10 +74,10 @@ function LoginForm()  {
 
     // promena strane 
     let navigate = useNavigate();
-    const routeChange = () =>{ 
+    /*const routeChange = () =>{ 
       let path = `/Main`; 
       navigate(path);
-    }
+    }*/
 
 
 

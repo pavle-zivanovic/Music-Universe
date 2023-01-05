@@ -1,6 +1,6 @@
 import * as React from 'react';
 // Routing 
-import { BrowserRouter ,Route ,Routes, Navigate} from "react-router-dom";
+import { Route ,Routes, Navigate} from "react-router-dom";
 
 // Components 
 import Main from './Components/Main';

@@ -9,8 +9,6 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import Typography from '@mui/material/Typography';
 import { Button, Icon } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import { display, width } from '@mui/system';
 
 function PlayBar(){
 
@@ -39,7 +37,7 @@ function PlayBar(){
 
 
     React.useEffect(() => {
-      if(timerTrigger==true)
+      if(timerTrigger===true)
       {
         if(!isSliding)
           seekUpdate()
@@ -98,7 +96,7 @@ function PlayBar(){
       function seekUpdate(seekPoint=-1) {
         let currTime = seekPoint/100*curr_track.duration
 
-        if(seekPoint==-1)
+        if(seekPoint===-1)
         {
           currTime=curr_track.currentTime
           document.getElementsByClassName("seek_slider")[0].value = curr_track.currentTime/curr_track.duration*100
@@ -187,7 +185,7 @@ function PlayBar(){
       }
 
       function nextTrack() {
-        if(trackIndex==track_list.length-2)
+        if(trackIndex===track_list.length-2)
         {
           pauseTrack()
           return;
@@ -196,7 +194,7 @@ function PlayBar(){
       }
 
       function prevTrack() {
-        if(trackIndex==0)
+        if(trackIndex===0)
           return;
 
         if (trackIndex > 0)
