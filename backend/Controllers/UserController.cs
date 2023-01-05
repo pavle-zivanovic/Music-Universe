@@ -68,9 +68,14 @@ namespace Music_Universe.Controllers
                 return Ok("1"); // pogresan username ili password 
             }
 
-            var token = jwtService.Generate(user.FirstOrDefault().id);
+          
             
-            return Ok(token);
+            var jwt = new 
+            {
+                token = jwtService.Generate(user.FirstOrDefault().id)
+            };
+
+            return Ok(jwt);
         }
 
         [Route("Getusers")]

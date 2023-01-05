@@ -167,18 +167,20 @@ function Main(){
     }
     if (songName && singerName  && songGenre && songLyrics && songWritter && releaseDate && songFile){
         
-        addSong()
+      alert("Song : "  + songName + "\n" +
+      "Singer :" + singerName + "\n" +
+      "Album :" + albumName + "\n" +
+      "Release Date :" + releaseDate.toString() + "\n" +
+      "Song Writter :" + songWritter + "\n" +
+      "Genre : " + songGenre + "\n" +
+      "Lyrics  :" + songLyrics[0] + "\n" 
+      )
+      setSingerName("");setSongWritter('');
+      setOpen(false)
+      addSong()
 
     }
-    alert("Song : "  + songName + "\n" +
-          "Singer :" + singerName + "\n" +
-          "Album :" + albumName + "\n" +
-          "Release Date :" + releaseDate.toString() + "\n" +
-          "Song Writter :" + songWritter + "\n" +
-          "Genre : " + songGenre + "\n" +
-          "Lyrics  :" + songLyrics[0] + "\n" 
-    )
-    setOpen(false)
+
   }
 
   async function addSong(){
@@ -187,7 +189,7 @@ function Main(){
     const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 
-    let rezPevac = await fetch("Singer/GetSinger/" + singerName,{
+    let rezPevac = await fetch("Singer/GetSinger/"+singerName,{
       method : 'GET',
       headers : {
         'Content-Type' : 'aplication/json; charset=utf-8',
@@ -195,7 +197,8 @@ function Main(){
       }
     });
     let pevac = await rezPevac.json();
-
+ 
+    
     let rezAlbum = await fetch("Song/GetAlbum/" + albumName,{
       method : 'GET',
       headers : {
@@ -213,7 +216,7 @@ function Main(){
         'Accept' : 'aplication/json; charset=utf-8',
       }
     });
-    let tekstopisac = await rezTekstopisac.json();    
+    let tekstopisac = await rezTekstopisac.json();   
 
     const song = {
       title : songName,
@@ -224,7 +227,7 @@ function Main(){
       image : coverImage,
       streams : 0 ,
     };
-    //console.log(user);
+    console.log(song);
     let result = await fetch("Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
       method : 'POST',
       headers : {

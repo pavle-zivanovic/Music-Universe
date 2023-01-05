@@ -91,7 +91,7 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-        [Route("GetSinger/{singerName}")]
+        [Route("GetSinger/singerName")]
         [HttpGet]
         public async Task<IActionResult> GetSinger(string singerName)
         {

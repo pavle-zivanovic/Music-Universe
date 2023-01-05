@@ -49,9 +49,14 @@ function LoginForm()  {
       });
 
       let a = await result.json(); 
-      console.log(a);        
-      localStorage.setItem('user-info',JSON.stringify(a));
+      //console.log(a.token);        
+      localStorage.setItem('user-info',JSON.stringify(a.token));
       const token = (JSON.parse(window.localStorage.getItem('user-info')));
+
+      if ( a != null){
+        navigate("/Main");
+      }
+      //console.log(token);
     }
 
 
