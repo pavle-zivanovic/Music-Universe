@@ -46,14 +46,6 @@ namespace Music_Universe.Controllers
 
             // Vec postoji
             if (pesmaja.LastOrDefault() != null){return Ok(0);}
-      
-            var newSong = await neo4j.Cypher.Create("(u:Song $u)")
-                                .WithParam("u", song)
-                                .Set("u.id = id(u)")
-                                .Return(u => u.As<Song>().id)
-                                .ResultsAsync;
-
-            int songID = newSong.LastOrDefault();
 
             // provera Singer-a
             var pevaljka = await neo4j.Cypher.Match("(s: Singer)")
@@ -62,43 +54,67 @@ namespace Music_Universe.Controllers
 
             if ( pevaljka.LastOrDefault() == null){return BadRequest("Nepostojeca pevaljka");}
 
+            // provera Songwriter-a
+            var pisacTexta = await neo4j.Cypher.Match("(s: Songwriter)")
+                                .Where(( Songwriter s) => s.id == songwriterID)
+                                .Return( s => s.As<Songwriter>()).ResultsAsync;
+            
+            if ( pisacTexta.LastOrDefault() == null){return BadRequest("Nepostojeci tekstopisac");}
+
+            // provera Albuma-a
+            if ( albumID != -1)
+            {
+                var albumce = await neo4j.Cypher.Match("(s: Album)")
+                                .Where(( Album s) => s.id == albumID)
+                                .Return( s => s.As<Album>()).ResultsAsync;
+
+                if ( albumce.LastOrDefault() == null){return BadRequest("Nepostojeci album");}
+            } 
+
+
+            var newSong = await neo4j.Cypher.Create("(u:Song $u)")
+                                .WithParam("u", song)
+                                .Set("u.id = id(u)")
+                                .Return(u => u.As<Song>().id)
+                                .ResultsAsync;
+
+            int songID = newSong.LastOrDefault();
+
+
             await neo4j.Cypher.Match("(a:Singer), (b:Song)")
                                 .Where((Singer a, Song b) => a.id == pevacID && b.id == songID)
                                 .Create("(a)-[r:sings]->(b)")
                                 .ExecuteWithoutResultsAsync();
 
 
-            // provera Songwriter-a
-            var pisacTexta = await neo4j.Cypher.Match("(s: Songwriter)")
-                                .Where(( Songwriter s) => s.id == songwriterID)
-                                .Return( s => s.As<Songwriter>()).ResultsAsync;
-
-            if ( pisacTexta.LastOrDefault() == null){return BadRequest("Nepostojeci tekstopisac");}
-
             await neo4j.Cypher.Match("(a:Songwriter), (b:Song)")
                                 .Where((Songwriter a, Song b) => a.id == songwriterID && b.id == songID)
                                 .Create("(a)-[r:writes]->(b)")
                                 .ExecuteWithoutResultsAsync();
 
+            var like = false;
+            Dictionary<string, object> ratingDict = new Dictionary<string, object>();
+            ratingDict.Add("like", like);
 
-            // provera Albuma-a
-            if ( albumID == -1){return Ok(newSong.LastOrDefault());} 
+            await neo4j.Cypher.Match("(u:User), (s:Song)")
+                              .Where((Song s) => s.id == songID)
+                              .Create("(s)-[r:Has]->(rating: Rating $rating)<-[rel:Liked]-(u)")
+                              .WithParam("rating", ratingDict)
+                              .Set("rating.id = id(rating)")
+                              .ExecuteWithoutResultsAsync();
 
-            var albumce = await neo4j.Cypher.Match("(s: Album)")
-                                .Where(( Album s) => s.id == albumID)
-                                .Return( s => s.As<Album>()).ResultsAsync;
-
-            if ( albumce.LastOrDefault() == null){return BadRequest("Nepostojeci album");}
-
-            await neo4j.Cypher.Match("(a:Album), (b:Song)")
+            if(albumID != -1)
+            {
+                 await neo4j.Cypher.Match("(a:Album), (b:Song)")
                                 .Where((Album a, Song b) => a.id == albumID && b.id == songID)
-                                .Create("(a)-[r:contatins]->(b)")
+                                .Create("(a)-[r:contains]->(b)")
                                 .ExecuteWithoutResultsAsync();
-
-
+            }
+           
             // Success
             return Ok(1);
         }
+
         // Create Album entity
         [Route("AddAlbum/jwt")]
         [HttpPost]
@@ -219,6 +235,100 @@ namespace Music_Universe.Controllers
             await neo4j.Cypher.Match("(u:User)-[rel1:Liked]->(r:Rating)<-[rel2:Has]-(s:Song)")
                               .Where((User u, Song s) => u.id == userID && s.id == songID)
                               .Set("r.like = true")
+                              .ExecuteWithoutResultsAsync();
+
+            return Ok("Uspesno");
+        }
+
+
+        [Route("GetSongsTopCharts")]
+        [HttpGet]
+        public async Task<IActionResult> GetSongsTopCharts()
+        {
+            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sings]-(s:Singer)")
+                                          .With("n, s")
+                                          .OrderByDescending("n.streams")
+                                          .Return((n, s) => new 
+                                          {
+                                            Song = n.As<Song>(),
+                                            singerName = s.As<Singer>().name
+                                           })
+                                           .Limit(50)
+                                           .ResultsAsync;
+
+            return Ok(songs);
+        }
+
+
+        [Route("SearchSongs/{name}")]
+        [HttpGet]
+        public async Task<IActionResult> SearchSongs(string name)
+        {
+            var song = await neo4j.Cypher.Match("(s: Song)<-[r:sings]-(singer:Singer)")
+                                .Where((Song s, Singer singer) => s.title == name)
+                                .Return((s, singer) => new 
+                                        {
+                                            Song = s.As<Song>(),
+                                            singerName = singer.As<Singer>().name
+                                        }).ResultsAsync;
+
+            if(song.Count() == 0)
+            {
+                song = await neo4j.Cypher.Match("(n: Album)-[rel:contains]->(s:Song)<-[r:sings]-(singer:Singer)")
+                                .Where((Album n, Singer singer, Song s) => n.title == name)
+                                .Return((s, singer) => new 
+                                        {
+                                            Song = s.As<Song>(),
+                                            singerName = singer.As<Singer>().name
+                                        }).ResultsAsync;
+                
+                if(song.Count() == 0)
+                {
+                    song = await neo4j.Cypher.Match("(s: Song)<-[r:sings]-(singer:Singer)")
+                                .Where((Song s, Singer singer) => singer.name == name)
+                                .Return((s, singer) => new 
+                                        {
+                                            Song = s.As<Song>(),
+                                            singerName = singer.As<Singer>().name
+                                        }).ResultsAsync;
+                }
+            }
+
+            if(song.Count() == 0)
+            {
+                return Ok(0);
+            }
+            return Ok(song);
+        }
+
+
+        [Route("DeleteSong/{songID}/{userName}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteSong(int songID, string userName)
+        {
+            var song = await neo4j.Cypher.Match("(s: Song)<-[r:sings]-(singer:Singer)")
+                                .Where((Song s, Singer singer) => singer.name == userName && s.id == songID)
+                                .Return((s, singer) => new 
+                                        {
+                                            Song = s.As<Song>(),
+                                            singerName = singer.As<Singer>().name
+                                        }).ResultsAsync;
+
+            if(song.Count() == 0)
+            {
+                return Ok(0);// Niste u mogucnosti da brisete pesmu
+            }
+
+
+            await neo4j.Cypher.Match("(s:Song)-[r:Has]->(rating:Rating)")
+                              .Where((Song s) => s.id == songID)
+                              .DetachDelete("rating")
+                              .ExecuteWithoutResultsAsync();
+
+            
+            await neo4j.Cypher.Match("(s:Song)")
+                              .Where((Song s) => s.id == songID)
+                              .DetachDelete("s")
                               .ExecuteWithoutResultsAsync();
 
             return Ok("Uspesno");

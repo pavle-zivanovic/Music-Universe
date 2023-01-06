@@ -39,41 +39,46 @@ function Featured1({songs}){
     const handleClick = event => {
         setIsShown(true);
       };
-   
+
     return(
-        <Box sx={{ flexGrow: 1,
-                width:"89%", 
-                position:"relative",
-                left:"7%",
-                marginBottom:"2%" }}>
-            <Grid container spacing={2}>
-                {songs.map((song) => (
-                    <React.Fragment key={song.song.id}>
-                        <Grid xs={4} sm={3} md={2}>
-                            <IconButton onClick={handleClick}>
-                                <Tooltip title={song.singerName}
-                                        placement="top">
-                                    <div className="songCircle"
-                                    >
-                                        <div className="innerSongCircle">
-                                            <div className="secondInnerSongCircle"></div>
+        <div>
+            <Box sx={{ flexGrow: 1,
+                    width:"89%", 
+                    position:"relative",
+                    left:"7%",
+                    marginBottom:"2%" }}>
+                <Grid container spacing={2}>
+                    {songs.map((song) => (
+                        <React.Fragment key={song.song.id}>
+                            <Grid xs={4} sm={3} md={2}>
+                                <IconButton onClick={handleClick}>
+                                    <Tooltip title={song.singerName}
+                                            placement="top">
+                                        <div className="songCircle"
+                                        style={{backgroundImage: 
+                                            song.song.image!=null?'url('+ song.song.image + ')': null}}>
+                                            <div className="innerSongCircle">
+                                                <div className="secondInnerSongCircle"></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </Tooltip>
-                            </IconButton>
-                            <div 
-                            style={{color:"white",
-                                position:"relative",
-                                left:"15%",
-                                top:"6%"}}>
-                                {song.song.title}
-                            </div>
-                        </Grid>
-                    </React.Fragment>
-                ))}
-            </Grid>
-            {isShown && <PlayBar />}
-        </Box>
+                                    </Tooltip>
+                                </IconButton>
+                                <div 
+                                style={{color:"white",
+                                    position:"relative",
+                                    left:"15%",
+                                    top:"6%"}}>
+                                    {song.song.title}
+                                </div>
+                            </Grid>
+                        </React.Fragment>
+                    ))}
+                </Grid>
+            </Box>
+            <div>
+                {isShown && <PlayBar />}
+            </div>
+        </div>
     );
 }
 

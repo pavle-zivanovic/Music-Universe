@@ -248,6 +248,18 @@ function Main(){
         open={isMobileMenuOpenRight}
         onClose={handleMobileMenuCloseRight}
         >
+        <MenuItem>
+          <IconButton
+                onClick={handleClick}
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-haspopup="true"
+              >
+                <AddIcon />
+          </IconButton>
+          <p>Add your song</p>
+        </MenuItem>
         <MenuItem> 
             <IconButton
             size="large"
