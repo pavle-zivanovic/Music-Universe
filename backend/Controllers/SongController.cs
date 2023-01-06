@@ -145,18 +145,20 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-        [Route("GetSongsFeatured")]
+        [Route("GetSongsFeatured/{userID}")]
         [HttpGet]
-        public async Task<IActionResult> GetSongsFeatured()
+        public async Task<IActionResult> GetSongsFeatured(int userID)
         {
-            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sings]-(s:Singer)")
-                                            .Return((n, s) => new 
+            var songs = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
+                                          .Where((User user) => user.id == userID)
+                                          .Return((singer, song, rating) => new 
                                             {
-                                                Song = n.As<Song>(),
-                                                singerName = s.As<Singer>().name
+                                                Song = song.As<Song>(),
+                                                singerName = singer.As<Singer>().name,
+                                                rating = rating.As<Rating>().like
                                             })
-                                            .Limit(100)
-                                            .ResultsAsync;
+                                          .Limit(100)
+                                          .ResultsAsync;
 
             return Ok(songs);
         }
@@ -173,10 +175,11 @@ namespace Music_Universe.Controllers
 
             var songs = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
                                           .Where((User user, Rating rating) => user.id == userID && rating.like == true)
-                                          .Return((singer, song) => new 
+                                          .Return((singer, song, rating) => new 
                                             {
                                                 Song = song.As<Song>(),
-                                                singerName = singer.As<Singer>().name
+                                                singerName = singer.As<Singer>().name,
+                                                rating = rating.As<Rating>().like
                                             })
                                           .ResultsAsync;
 
@@ -234,7 +237,7 @@ namespace Music_Universe.Controllers
 
             await neo4j.Cypher.Match("(u:User)-[rel1:Liked]->(r:Rating)<-[rel2:Has]-(s:Song)")
                               .Where((User u, Song s) => u.id == userID && s.id == songID)
-                              .Set("r.like = true")
+                              .Set("r.like = not r.like")
                               .ExecuteWithoutResultsAsync();
 
             return Ok("Uspesno");
@@ -331,7 +334,7 @@ namespace Music_Universe.Controllers
                               .DetachDelete("s")
                               .ExecuteWithoutResultsAsync();
 
-            return Ok("Uspesno");
+            return Ok(1);//Uspesno
         }
 
 

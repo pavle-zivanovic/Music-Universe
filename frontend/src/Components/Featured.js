@@ -6,13 +6,15 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import {useEffect, useState} from "react";
 import PlayBar from './PlayBar';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 function Featured(){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/",
+        fetch("/Song/GetSongsFeatured/"+10,
         {
             method:"GET",
             headers: {
@@ -35,10 +37,42 @@ function Featured(){
 function Featured1({songs}){
 
     const [isShown, setIsShown] = useState(false);
+    let songID = null;
 
     const handleClick = event => {
         setIsShown(true);
       };
+
+    const LikeTheSong = (id) =>{
+        songID = id;
+
+        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+        })
+        window.location.reload(true)
+    }
+
+    const DeleteSong = (id) =>{
+        songID = id;
+
+        fetch("/Song/DeleteSong/"+songID+"/"+"payaz",
+        {
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+        }).then((res) =>  res.json())
+        .then((data) => {
+                if(data == 0)
+                {
+                    alert("Niste u mogucnosti da obrisete pesmu!");
+                }
+            });
+    }
 
     return(
         <div>
@@ -69,6 +103,19 @@ function Featured1({songs}){
                                     left:"15%",
                                     top:"6%"}}>
                                     {song.song.title}
+                                </div>
+                                <div 
+                                style={{position:"relative",
+                                    left:"8%",
+                                    top:"6%"}}>
+                                    <IconButton sx={{color:song.rating == true ? "red" : "white"}}
+                                    onClick={()=>LikeTheSong(song.song.id)}>
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <IconButton sx={{color:"white"}}
+                                    onClick={()=>DeleteSong(song.song.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
                                 </div>
                             </Grid>
                         </React.Fragment>

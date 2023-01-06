@@ -6,13 +6,14 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import {useEffect, useState} from "react";
 import PlayBar from './PlayBar';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 
 function ForYou(){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsForYou/"+2,
+        fetch("/Song/GetSongsForYou/"+10,
         {
             method:"GET",
             headers: {
@@ -35,10 +36,24 @@ function ForYou(){
 function ForYou1({songs}){
 
     const [isShown, setIsShown] = useState(false);
+    let songID = null;
 
     const handleClick = event => {
         setIsShown(true);
       };
+
+    const LikeTheSong = (id) =>{
+        songID = id;
+
+        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+        })
+        window.location.reload(true)
+    }
 
     return(
         <div>
@@ -69,6 +84,15 @@ function ForYou1({songs}){
                                     left:"14%",
                                     top:"6%"}}>
                                     {song.song.title}
+                                </div>
+                                <div 
+                                style={{position:"relative",
+                                    left:"15%",
+                                    top:"6%"}}>
+                                    <IconButton sx={{color:song.rating == true ? "red" : "white"}}
+                                    onClick={()=>LikeTheSong(song.song.id)}>
+                                        <FavoriteIcon />
+                                    </IconButton>
                                 </div>
                             </Grid>
                         </React.Fragment>
