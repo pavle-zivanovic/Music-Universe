@@ -5,7 +5,7 @@ import { /*CardMedia,*/ Typography } from '@mui/material';
 //import Card from '@mui/material/Card';
 //import { CardContent, CardMedia, CssBaseline } from '@material-ui/core';
 //import Typography from '@mui/material/Typography';
-//import '../Styles/Charts.css';
+
 //import Avatar from '@mui/material/Avatar';
 import Icon from '@mui/material/Icon';
 import { styled } from '@mui/material/styles';
@@ -18,7 +18,6 @@ const Img = styled('img')({
     maxWidth: '100%',
     maxHeight: '100%',
   });
-  //const artistCover = 'url("../Images/maya.jpg")' 
   const artistNames = ['Maya Berovic', 'Maya Berovic','Maya Berovic','Maya Berovic','Maya Berovic']
   function Charts(){
 
@@ -27,7 +26,7 @@ const Img = styled('img')({
             display:'flex' ,
             flexDirection:'column', 
             //alignItems:'center', 
-            margin:'20px 250px 500px 200px',
+            margin:'0px 0px 500px 0px',
             //backgroundColor:'darkviolet'
             }}>
             <div >
@@ -35,7 +34,7 @@ const Img = styled('img')({
             style={{
                 fontSize:'calc(25px + 1vw)',
                 color:'white',
-                margin:'100px 0px 0px 0px',
+                margin:'0px 0px 0px 0px',
                 fontWeight:'bold', 
                 textAlign:'right', 
                 //display:'inline-block', 
@@ -109,12 +108,13 @@ const Img = styled('img')({
                                 {artistNames[index]}
                         </Typography>
                     </div>
-                    <div style={{display:'flex'}}>
+                    
                     <Typography
                          style={{
                             position:'absolute', 
-                            marginLeft:'50vw',
-                            fontSize:'calc(10px + 0.5vw)',
+                            //left:'70px',
+                            marginLeft:'85vw',
+                            fontSize:'calc(8px + 0.5vw)',
                             color:'white', 
                             textAlign:'right',
                             display:'inline-block', 
@@ -124,7 +124,7 @@ const Img = styled('img')({
                             }}> 
                             {songsStreams[index].toLocaleString()} streams 
                     </Typography>
-                    </div>
+                    
                 </div>
             ))}
             </div>
