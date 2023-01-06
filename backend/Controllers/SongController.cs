@@ -333,5 +333,24 @@ namespace Music_Universe.Controllers
 
             return Ok("Uspesno");
         }
+
+
+        [Route("GetSongView/{songID}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSongView(int songID)
+        {
+            var song = await neo4j.Cypher.Match("(n: Song)<-[r:sings]-(s:Singer)")
+                                            .Where((Song n) => n.id == songID)  
+                                            .OptionalMatch("(a:Album)-[rel:contains]->(n)") 
+                                            .Return((n, s, a) => new 
+                                            {
+                                                Song = n.As<Song>(),
+                                                singerName = s.As<Singer>().name,
+                                                albumName = a.As<Album>().title
+                                            })
+                                            .ResultsAsync;
+
+            return Ok(song.LastOrDefault());
+        }
     }
 }
