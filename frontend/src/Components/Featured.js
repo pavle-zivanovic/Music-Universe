@@ -9,7 +9,7 @@ import PlayBar from './PlayBar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
-import { singerIndexContext } from './ArtistContext';
+import { singerIndexContext, songIDContext } from './ArtistContext';
 
 
 function Featured(){
@@ -50,7 +50,7 @@ function Featured1({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        fetch("/Song/LikeTheSong/"+0+"/"+songID,
         {
             method:"PUT",
             headers:{
@@ -82,12 +82,14 @@ function Featured1({songs}){
     const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
 
     const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)  
+    const {songId, setSongId} = React.useContext(songIDContext)  
 
     const SelectTheSong = (id) =>{
         setTrackList(songs);
         setTrackIndex(id);
 
         setSingerIndex(songs[id].singerName)
+        setSongId(songs[id].song.id)
     }  
 
     return(

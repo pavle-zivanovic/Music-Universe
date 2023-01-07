@@ -36,6 +36,18 @@ function PlayBar(){
         setTimerTrigger(false)
       }
     }, [timerTrigger]);
+
+    const IncreasePlaysNumber = (id) =>{
+      var songID = id;
+
+      fetch("/Song/IncreasePlaysNumber/"+songID,
+      {
+          method:"PUT",
+          headers:{
+              "Content-Type":"application/json"
+          },
+      })
+  }
     
 
       function loadTrack(trackIndex, toPlay=false) {
@@ -45,6 +57,7 @@ function PlayBar(){
         setCurSong(trackList[trackIndex]);
         curr_track.src = trackList[trackIndex].song.song;
         curr_track.load();
+        IncreasePlaysNumber(trackList[trackIndex].song.id)
        
         updateTimer = setInterval(timerUpdate, 1000);
         curr_track.addEventListener("ended", nextTrack);
@@ -213,7 +226,7 @@ function PlayBar(){
             </Icon>
             {false?
             <div style={{display:'flex',flexDirection: 'column'}}>
-            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'right'}}>{curr_song!=null? curr_song.song.title:""}</Typography>
+            <Typography onClick={() => navigate("song")} style={{margin:'10px 10px 0px 10px', textAlign:'right'}}>{curr_song!=null? curr_song.song.title:""}</Typography>
             <Typography onClick={() => navigate("artist")} style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{curr_song!=null? curr_song.singerName:""}</Typography>
             </div>:null}
           </div>
@@ -222,7 +235,7 @@ function PlayBar(){
           </div>
 
           {true? <div style={{display:'flex',flexDirection: 'column', alignSelf:'end'}}>
-            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'left'}}>{curr_song!=null? curr_song.song.title: ""}</Typography>
+            <Typography onClick={() => navigate("song")} style={{margin:'10px 10px 0px 10px', textAlign:'left'}}>{curr_song!=null? curr_song.song.title: ""}</Typography>
             <Typography onClick={() => navigate("artist")} style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'left', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{curr_song!=null? curr_song.singerName:""}</Typography>
           </div> : null}
           <div style={{width:'80%', marginTop:'50px'}}>

@@ -143,19 +143,21 @@ namespace Music_Universe.Controllers
         [Route("GetSingerPopularSongs/{singerName}")]
         [HttpGet]
         public async Task<IActionResult> GetSingerPopularSongs(string singerName)
-        {
+        {                              
+            var songs = await neo4j.Cypher.Match("(n: Song)<-[r:sings]-(s:Singer)")
+                                          .Where((Singer s) => s.name == singerName)
+                                          .With("n, s")
+                                          .OrderByDescending("n.streams")
+                                          .Return((n, s) => new 
+                                          {
+                                            Song = n.As<Song>(),
+                                            singerName = s.As<Singer>().name
+                                           })
+                                           .Limit(10)
+                                           .ResultsAsync;                                                  
 
-             var popularSongs = await neo4j.Cypher.Match("(s: Singer)-[r:sings]->(song:Song)")
-                              .Where((Singer s) => s.name == singerName)
-                              .Return((s, song) => new 
-                                            {
-                                                Song = song.As<Song>(),
-                                                singerName = s.As<Singer>().name
-                                            })
-                              .Limit(10)              
-                              .ResultsAsync;                                   
-
-            return Ok(popularSongs);
+            return Ok(songs);
+                             
         }
 
 

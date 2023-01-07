@@ -32,7 +32,8 @@ import { TextField } from "@mui/material";
 import Artist from './Artist';
 import PlayBar from './PlayBar';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
-import { singerIndexContext } from './ArtistContext';
+import { singerIndexContext, songIDContext } from './ArtistContext';
+import SongView from './SongView';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -324,6 +325,7 @@ function Main(){
   const [trackList, setTrackList] = useState();
   const [trackIndex, setTrackIndex] = useState();
   const [singerIndex, setSingerIndex] = useState();
+  const [songId, setSongId] = useState();
 
   return (
     <div>
@@ -530,13 +532,16 @@ function Main(){
               </DialogActions>
           </Dialog> 
               <singerIndexContext.Provider value={{singerIndex, setSingerIndex}}>
+              <songIDContext.Provider value={{songId, setSongId}}>
               <Routes>
                   <Route path="" element={<Featured />} />
                   <Route path="foryou" element={<ForYou />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="artist" element={<Artist />} />
+                  <Route path="song" element={<SongView />} />
                   <Route path="/*" element={<LoginForm />} />
               </Routes>
+              </songIDContext.Provider> 
               </singerIndexContext.Provider> 
         </div>
       </Box>

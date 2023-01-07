@@ -9,14 +9,17 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import {useEffect, useState} from "react";
 import { FormControlUnstyled } from '@mui/base';
+import { songIDContext } from './ArtistContext';
 
 
 function SongView(){
     const [song ,setSong] = useState(null);
     const [lyrics, setLyrics] = useState(null);
 
+    const {songId, setSongId} = React.useContext(songIDContext)  
+
     useEffect(() => {
-        fetch("/Song/GetSongView/"+1,
+        fetch("/Song/GetSongView/"+songId,
         {
             method:"GET",
             headers: {
@@ -28,7 +31,7 @@ function SongView(){
                 setSong(data);
                 setLyrics(data.song.lyrics.split("."));
             });
-      },[])
+      },[songId])
 
       return(
         <div>

@@ -7,13 +7,15 @@ import IconButton from '@mui/material/IconButton';
 import {useEffect, useState} from "react";
 import PlayBar from './PlayBar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { trackListContext, trackIndexContext } from './PlayBarContext';
+import { singerIndexContext, songIDContext } from './ArtistContext';
 
 
 function ForYou(){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsForYou/"+10,
+        fetch("/Song/GetSongsForYou/"+0,
         {
             method:"GET",
             headers: {
@@ -42,10 +44,24 @@ function ForYou1({songs}){
         setIsShown(true);
       };
 
+      const {trackList, setTrackList} = React.useContext(trackListContext)  
+      const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+  
+      const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)    
+      const {songId, setSongId} = React.useContext(songIDContext)  
+
+    const SelectTheSong = (id) =>{
+        setTrackList(songs);
+        setTrackIndex(id);
+
+        setSingerIndex(songs[id].singerName)
+        setSongId(songs[id].song.id)
+    }  
+
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        fetch("/Song/LikeTheSong/"+0+"/"+songID,
         {
             method:"PUT",
             headers:{
@@ -63,10 +79,10 @@ function ForYou1({songs}){
                     left:"7%",
                     marginBottom:"2%" }}>
                 <Grid container spacing={2}>
-                    {songs.map((song) => (
+                    {songs.map((song, index) => (
                         <React.Fragment key={song.song.id}>
                             <Grid xs={4} sm={3} md={2}>
-                                <IconButton onClick={handleClick}>
+                                <IconButton onClick={()=>{SelectTheSong(index)}}>
                                     <Tooltip title={song.singerName}
                                             placement="top">
                                         <div className="songCircle"
