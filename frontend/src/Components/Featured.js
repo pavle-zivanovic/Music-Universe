@@ -8,13 +8,15 @@ import {useEffect, useState} from "react";
 import PlayBar from './PlayBar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { trackListContext, trackIndexContext } from './PlayBarContext';
+import { singerIndexContext } from './ArtistContext';
 
 
 function Featured(){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/"+10,
+        fetch("/Song/GetSongsFeatured/"+0,
         {
             method:"GET",
             headers: {
@@ -24,6 +26,7 @@ function Featured(){
         .then((res) =>  res.json())
         .then((data) => {
                 setSongs(data);
+                console.log(data)
             });
       },[])
 
@@ -42,6 +45,7 @@ function Featured1({songs}){
     const handleClick = event => {
         setIsShown(true);
       };
+
 
     const LikeTheSong = (id) =>{
         songID = id;
@@ -74,6 +78,18 @@ function Featured1({songs}){
             });
     }
 
+    const {trackList, setTrackList} = React.useContext(trackListContext)  
+    const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+
+    const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)  
+
+    const SelectTheSong = (id) =>{
+        setTrackList(songs);
+        setTrackIndex(id);
+
+        setSingerIndex(songs[id].singerName)
+    }  
+
     return(
         <div>
             <Box sx={{ flexGrow: 1,
@@ -82,10 +98,10 @@ function Featured1({songs}){
                     left:"7%",
                     marginBottom:"2%" }}>
                 <Grid container spacing={2}>
-                    {songs.map((song) => (
+                    {songs.map((song, index) => (
                         <React.Fragment key={song.song.id}>
                             <Grid xs={4} sm={3} md={2}>
-                                <IconButton onClick={handleClick}>
+                                <IconButton onClick={()=>SelectTheSong(index)}>
                                     <Tooltip title={song.singerName}
                                             placement="top">
                                         <div className="songCircle"
@@ -115,7 +131,7 @@ function Featured1({songs}){
                                     <IconButton sx={{color:"white"}}
                                     onClick={()=>DeleteSong(song.song.id)}>
                                         <DeleteIcon />
-                                    </IconButton>
+                                    </IconButton>              
                                 </div>
                             </Grid>
                         </React.Fragment>
@@ -123,7 +139,7 @@ function Featured1({songs}){
                 </Grid>
             </Box>
             <div>
-                {isShown && <PlayBar />}
+
             </div>
         </div>
     );

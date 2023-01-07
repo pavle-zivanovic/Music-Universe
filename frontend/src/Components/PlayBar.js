@@ -9,31 +9,23 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import Typography from '@mui/material/Typography';
 import { Button, Icon } from '@mui/material';
+import { trackListContext, trackIndexContext } from './PlayBarContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function PlayBar(){
 
-    const [curTrackTime, setCurTrackTime] = React.useState(0)
     const [firstRender, setFirstRender] = React.useState(true)
     const [curTrackTimeDisplay, setCurTrackTimeDisplay] = React.useState("00.00")
     const [curTrackDurationDisplay, setCurTrackDurationDisplay] = React.useState("00.00")
     const [isPlaying, setIsPlaying] = React.useState(false)
     const [isLoaded, setIsLoaded] = React.useState(false)
-    const [trackIndex, setTrackIndex] = React.useState(0)
     let updateTimer
+    const [curr_song, setCurSong] = React.useState()
     const [curr_track, setCurTrack] = React.useState(document.createElement('audio'))
     const [isSliding, setIsSliding] = React.useState(false)
     const [timerTrigger, setTimerTrigger] = React.useState(false)
+    const navigate = useNavigate();
 
-    React.useEffect(() => {
-      if(firstRender)
-      {
-        document.getElementsByClassName("seek_slider")[0].value = 0
-        setFirstRender(false)
-        return
-      }
-      console.log(trackIndex)
-      loadTrack(trackIndex, true);
-    }, [trackIndex]);
 
 
     React.useEffect(() => {
@@ -45,38 +37,13 @@ function PlayBar(){
       }
     }, [timerTrigger]);
     
-    let track_list = [
-        {
-            name: "Alkohol",
-            artist: "Maya Berovic",
-            image: 'url("../Images/maya.jpg")',
-            path: "../Music/Hint.wav",
-        },
-        {
-            name: "Neka stvar",
-            artist: "Maya Berovic",
-            image: 'url("../Images/maya.jpg")',
-            path: "../Music/LevelSelect.wav",
-        },
-        {
-          name: "Harem",
-          artist: "Maya Berovic",
-          image: 'url("../Images/maya.jpg")',
-          path: "../Music/NextLevel.wav",
-        },
-        {
-          name: "Hurem",
-          artist: "Maya Berovic",
-          image: 'url("../Images/maya.jpg")',
-          path: "../Music/NextLevel.wav",
-        },
-      ];
 
-      function loadTrack(track_index, toPlay=false) {
+      function loadTrack(trackIndex, toPlay=false) {
         clearInterval(updateTimer);
         resetValues();
        
-        curr_track.src = track_list[track_index].path;
+        setCurSong(trackList[trackIndex]);
+        curr_track.src = trackList[trackIndex].song.song;
         curr_track.load();
        
         updateTimer = setInterval(timerUpdate, 1000);
@@ -179,13 +146,12 @@ function PlayBar(){
       }
 
       function resetValues() {
-        setCurTrackTime(0)
         setCurTrackTimeDisplay("00.00");
         setCurTrackDurationDisplay("00.00");
       }
 
       function nextTrack() {
-        if(trackIndex===track_list.length-2)
+        if(trackIndex===trackList.length-1)
         {
           pauseTrack()
           return;
@@ -211,6 +177,27 @@ function PlayBar(){
           curr_track.currentTime = document.getElementsByClassName("seek_slider")[0].value/100*curr_track.duration;
       };
 
+      const {trackList, setTrackList} = React.useContext(trackListContext)  
+      const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+
+      React.useEffect(() => {
+        console.log(trackList)
+        console.log(trackIndex)
+        if(trackList!=null && trackIndex>=0){
+          setCurSong(trackList[trackIndex]);
+          console.log(trackList[trackIndex]);
+
+          if(firstRender)
+          {
+            document.getElementsByClassName("seek_slider")[0].value = 0
+            setFirstRender(false)
+            return
+          }
+          loadTrack(trackIndex, true);
+        }
+      },[trackList, trackIndex])
+
+
     return (
         <AppBar 
         position="sticky" 
@@ -219,35 +206,39 @@ function PlayBar(){
             <Icon
             className='Vinyl'
             style={{marginLeft:'10px', marginTop:'10px' ,backgroundImage:'url("../Images/vinyl.jpg")',maxWidth:'200px', maxHeight:'160px', width:'20vw', height:'16vw'}}>
-              <div className="songCirclePlayBar"
-              style={{animationName:isPlaying?'rotate':'',background: track_list[trackIndex].image, width:'60%',backgroundSize:'cover', height:'75%', margin:'10% 10% 10% 11%'}}>
+              {curr_song!=null? <div className="songCirclePlayBar"
+              style={{animationName:isPlaying?'rotate':'',background: 'url('+ curr_song.song.image + ')', width:'60%', height:'75%', margin:'10% 10% 10% 11%'}}>
                   <div className="innerSongCircleBlack"></div>
-              </div>
+              </div>:null}
             </Icon>
             {false?
             <div style={{display:'flex',flexDirection: 'column'}}>
-            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'right'}}>{track_list[trackIndex].name}</Typography>
-            <Typography style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{track_list[trackIndex].artist}</Typography>
+            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'right'}}>{curr_song!=null? curr_song.song.title:""}</Typography>
+            <Typography onClick={() => navigate("artist")} style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{curr_song!=null? curr_song.singerName:""}</Typography>
             </div>:null}
           </div>
+          <div style={{display:'flex',flexDirection: 'column', alignSelf:'end'}}>
+            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'left'}}>{trackIndex}</Typography>
+          </div>
+
           {true? <div style={{display:'flex',flexDirection: 'column', alignSelf:'end'}}>
-            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'left'}}>{track_list[trackIndex].name}</Typography>
-            <Typography style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'left', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{track_list[trackIndex].artist}</Typography>
+            <Typography style={{margin:'10px 10px 0px 10px', textAlign:'left'}}>{curr_song!=null? curr_song.song.title: ""}</Typography>
+            <Typography onClick={() => navigate("artist")} style={{margin:'0px 10px 10px 10px', fontWeight:'bold', textAlign:'left', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{curr_song!=null? curr_song.singerName:""}</Typography>
           </div> : null}
           <div style={{width:'80%', marginTop:'50px'}}>
             <Toolbar className='playbar'>
                 <div
                 style={{whiteSpace:'nowrap'}}>
                     <Button sx={{ mr: 2, 
-                    color:"rgb(255, 255, 255)"}}
-                    onClick={() => {prevTrack();}}>
+                    color: curr_song!=null? "rgb(255, 255, 255)" : "rgb(180, 120, 180)"}}
+                    onClick={() => {if(curr_song!=null)prevTrack();}}>
                         <SkipPreviousIcon
                             fontSize="large"
                             />
                     </Button>
                     <Button sx={{ mr: 2, 
-                    color:"rgb(255, 255, 255)"}}
-                    onClick={() => {playpauseTrack();}}>
+                    color: curr_song!=null? "rgb(255, 255, 255)" : "rgb(180, 120, 180)"}}
+                    onClick={() => {if(curr_song!=null)playpauseTrack();}}>
                       {isPlaying?<PauseCircleFilledIcon
                         fontSize="large"
                         />:<PlayCircleFilledIcon
@@ -255,15 +246,15 @@ function PlayBar(){
                         />}
                     </Button>
                     <Button sx={{ mr: 2, 
-                    color:"rgb(255, 255, 255)"}}
-                    onClick={() => {nextTrack();}}>
+                    color: curr_song!=null? "rgb(255, 255, 255)" : "rgb(180, 120, 180)"}}
+                    onClick={() => {if(curr_song!=null)nextTrack();}}>
                         <SkipNextIcon
                         fontSize="large"
                         />
                     </Button>
                     <Button sx={{ mr: 2, 
-                    color:"rgb(255, 255, 255)"}}
-                    onClick={() => {loadTrack(trackIndex); playTrack();}}>
+                    color: curr_song!=null? "rgb(255, 255, 255)" : "rgb(180, 120, 180)"}}
+                    onClick={() => {if(curr_song!=null){loadTrack(trackIndex); playTrack();}}}>
                         <ReplayIcon
                         fontSize="large"
                         />
@@ -276,8 +267,8 @@ function PlayBar(){
                 <div>
                 <input type="range" min="1" max="100"
                  className="seek_slider" 
-                onChange={(e)=>seekUpdate(e.target.value)}
-                onPointerUp={(e)=>SlideDroped()}/>
+                onChange={(e)=>{if(curr_song!=null)seekUpdate(e.target.value)}}
+                onPointerUp={(e)=>{if(curr_song!=null)SlideDroped()}}/>
                 </div>
                 <Typography className="current-time"
                 style={{marginLeft:'10px'}}>{curTrackDurationDisplay}</Typography>

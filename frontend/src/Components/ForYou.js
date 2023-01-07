@@ -100,7 +100,7 @@ function ForYou1({songs}){
                 </Grid>
             </Box>
             <div>
-                {isShown && <PlayBar />}
+
             </div>
         </div>
     );

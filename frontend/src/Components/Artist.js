@@ -6,18 +6,69 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import { Button, Icon } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PlayBar from './PlayBar';
+import { trackListContext, trackIndexContext } from './PlayBarContext';
+import { singerIndexContext } from './ArtistContext';
 
 const songs = ['harem', 'Viktorijina tajnaaaa', 'Bebo', 'Nirvana', 'Haljina', 'Plava'];
 const songImages = ['url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")'];
 const songsStreams = [123111, 512333, 142322, 144457, 88651, 353451, 1766611, 765441, 4321331];
 const about = "Maya Berović is a Bosnian Serb singer. Born in Ilijaš, she debuted in 2007 with the album Život uživo"
 
-const artistCover = 'url("../Images/maya.jpg")' 
-const artistName = 'Maya Berovic'
+const artistCover = 'url("../Images/avatar.jpg")' 
 const birthday = '8 July 1987'
 const birthplace = 'Ilijas'
 //margin:'10% 10% 10% 10%'
 function Artist(){
+
+    const [singerStats ,setSingerStats] = React.useState(null);
+    const [allSongs ,setAllSongs] = React.useState(null);
+    const [popularSongs ,setPopularSongs] = React.useState(null);
+
+    const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)  
+
+    React.useEffect(() => {
+        fetch("/Singer/GetSingerStats/"+singerIndex,
+        {
+            method:"GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) =>  res.json())
+        .then((data) => {
+                setSingerStats(data[0]);
+            });
+
+        fetch("/Singer/GetSingerSongs/"+singerIndex,
+        {
+            method:"GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) =>  res.json())
+        .then((data) => {
+                setAllSongs(data);
+            });  
+            
+        fetch("/Singer/GetSingerPopularSongs/"+singerIndex,
+        {
+            method:"GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) =>  res.json())
+        .then((data) => {
+                setPopularSongs(data);
+            });
+
+        console.log(singerIndex);
+      },[singerIndex])
+      
 
     return(
         <div>
@@ -26,58 +77,13 @@ function Artist(){
                 <Icon
                 style={{background: artistCover, width:'200px', height:'200px',backgroundSize:'cover'}}>
                 </Icon>
-                <Typography style={{fontSize:'calc(15px + 2.5vw)',color:'white',margin:'0px 0px 0px calc(15px + 2.5vw)', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{artistName}</Typography>
+                <Typography style={{fontSize:'calc(15px + 2.5vw)',color:'white',margin:'0px 0px 0px calc(15px + 2.5vw)', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{singerStats!=null? singerStats.singerName:""}</Typography>
             </div> 
-            <Typography style={{fontSize:'calc(15px + 1vw)',color:'white',margin:'0px 0px 0px calc(15px + 1vw)', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> Popular tracks</Typography>
+            {popularSongs && popularSongs != null && <PopularSongs songs={popularSongs} />}
             <div>
-            {songs.map((song, index) => (
-
-                <div
-                key={index}
-                style={{display:'flex', flexDirection:'row', alignItems:'center', backgroundColor: index%2==0? 'rgb(91,0,91)': 'rgb(51,0,51)'}}>
-                    <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'0px 0px 0px 15px', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {index} </Typography>
-                    <Icon
-                    style={{background: songImages[index], width:'50px', height:'50px',backgroundSize:'cover', marginLeft:'15px'}}>
-                    </Icon>
-                    <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'0px 0px 0px 15px', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {songs[index]} </Typography>
-                    <Typography style={{position:'absolute', marginLeft:'80vw',fontSize:'calc(10px + 0.5vw)',color:'white', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {songsStreams[index].toLocaleString()} streams </Typography>
-                </div>
-            ))}
-            </div>
-            <div>
-
+            {allSongs && allSongs != null && <AllSongs songs={allSongs} />}
             </div>      
-            <Box sx={{ flexGrow: 1,
-                    width:"89%", 
-                    position:"relative",
-                    left:"7%",
-                    marginBottom:"2%" }}> 
-                <Grid container spacing={2}>
-                    {songs.map((song) => (
-                        <Grid key={song} 
-                        xs={4} sm={3} md={2}>
-                            <IconButton onClick={() => {alert("Klikić");}}>
-                                <Tooltip title="Maya Berovic"
-                                        placement="top">
-                                    <div className="songCircle"
-                                    style={{backgroundImage:'url("../Images/maya.jpg")'}}>
-                                        <div className="innerSongCircle">
-                                        <div className="secondInnerSongCircle"></div>
-                                        </div>
-                                    </div>
-                                </Tooltip>
-                            </IconButton>
-                            <div 
-                            style={{color:"white",
-                                position:"relative",
-                                left:"14%",
-                                top:"6%"}}>
-                                {song}
-                            </div>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+        
 
             <div
             style={{backgroundColor:'rgb(51,0,51)'}}>
@@ -85,14 +91,157 @@ function Artist(){
                     <Typography style={{fontSize:'calc(15px + 1vw)',color:'white',margin:'calc(10px + 0.7vw) 0px 0px calc(15px + 1vw)', fontWeight:'bold', textAlign:'right', display:'inline-block'}}> About</Typography>
                 </div>
                 <div>
-                     <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'calc(5px + 0.33vw) calc(5px + 0.33vw) calc(5px + 0.33vw) calc(15px + 1vw)', textAlign:'right', display:'inline-block'}}> Born in {birthplace} at {birthday} </Typography>    
+                     <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'calc(5px + 0.33vw) calc(5px + 0.33vw) calc(5px + 0.33vw) calc(15px + 1vw)', textAlign:'right', display:'inline-block'}}> Born in {singerStats!=null? singerStats.birthplace:""} at {singerStats!=null? singerStats.birthday:""} </Typography>    
                 </div>
                 <div>
-                    <Typography style={{fontSize:'calc(8px + 0.4vw)',color:'white',margin:'calc(5px + 0.33vw) calc(5px + 0.33vw) calc(30px + 2vw) calc(15px + 1vw)', textAlign:'left', display:'inline-block'}}> {about}{about}{about}{about} </Typography>
+                    <Typography style={{fontSize:'calc(8px + 0.4vw)',color:'white',margin:'calc(5px + 0.33vw) calc(5px + 0.33vw) calc(30px + 2vw) calc(15px + 1vw)', textAlign:'left', display:'inline-block'}}> {singerStats!=null? singerStats.biography:""} </Typography>
                 </div>
             </div>
         </div>
     );
+}
+
+function AllSongs({songs}){
+    const [isShown, setIsShown] = React.useState(false);
+    let songID = null;
+
+    const handleClick = event => {
+        setIsShown(true);
+      };
+
+    const {trackList, setTrackList} = React.useContext(trackListContext)   
+    const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+
+    const SelectTheSong = (id) =>{
+        setTrackIndex(id);
+        setTrackList(songs);
+    }  
+
+    const LikeTheSong = (id) =>{
+        songID = id;
+
+        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+        })
+        window.location.reload(true)
+    }
+
+    const DeleteSong = (id) =>{
+        songID = id;
+
+        fetch("/Song/DeleteSong/"+songID+"/"+"payaz",
+        {
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+        }).then((res) =>  res.json())
+        .then((data) => {
+                if(data == 0)
+                {
+                    alert("Niste u mogucnosti da obrisete pesmu!");
+                }
+            });
+    }
+
+    return(
+        <div>
+            <Box sx={{ flexGrow: 1,
+                width:"89%", 
+                position:"relative",
+                left:"7%",
+                marginBottom:"2%" }}>
+                <Grid container spacing={2}>
+                    {songs.map((song, index) => (
+                        <React.Fragment key={song.song.id}>
+                            <Grid xs={4} sm={3} md={2}>
+                                <IconButton onClick={()=>SelectTheSong(index)}>
+                                    <Tooltip title={song.singerName}
+                                            placement="top">
+                                        <div className="songCircle"
+                                        style={{backgroundImage: 
+                                            song.song.image!=null?'url('+ song.song.image + ')': null}}>
+                                            <div className="innerSongCircle">
+                                                <div className="secondInnerSongCircle"></div>
+                                            </div>
+                                        </div>
+                                    </Tooltip>
+                                </IconButton>
+                                <div 
+                                style={{color:"white",
+                                    position:"relative",
+                                    left:"15%",
+                                    top:"6%"}}>
+                                    {song.song.title}
+                                </div>
+                                <div 
+                                style={{position:"relative",
+                                    left:"8%",
+                                    top:"6%"}}>
+                                    <IconButton sx={{color:song.rating == true ? "red" : "white"}}
+                                    onClick={()=>LikeTheSong(song.song.id)}>
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <IconButton sx={{color:"white"}}
+                                    onClick={()=>DeleteSong(song.song.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>              
+                                </div>
+                            </Grid>
+                        </React.Fragment>
+                    ))}
+                </Grid>
+            </Box>
+            <div>
+
+            </div>
+        </div>
+    )
+}
+
+function PopularSongs({songs}){
+    const [isShown, setIsShown] = React.useState(false);
+    let songID = null;
+
+    const handleClick = event => {
+        setIsShown(true);
+      };
+
+    const {trackList, setTrackList} = React.useContext(trackListContext) 
+    const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+
+    const SelectTheSong = (id) =>{
+        setTrackIndex(id);
+        setTrackList(songs);
+    }    
+
+    return(
+        <div>
+             <Typography style={{fontSize:'calc(15px + 1vw)',color:'white',margin:'0px 0px 0px calc(15px + 1vw)', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> Popular tracks</Typography>
+            <div>
+            {songs.map((song, index) => (
+                <div
+                key={index}
+                onClick={()=>SelectTheSong(index)}
+                style={{display:'flex', flexDirection:'row', alignItems:'center', backgroundColor: index%2==0? 'rgb(91,0,91)': 'rgb(51,0,51)'}}>
+                    <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'0px 0px 0px 15px', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {index+1} </Typography>
+                    <Icon
+                    style={{background: song.song.image, width:'50px', height:'50px',backgroundSize:'cover', marginLeft:'15px'}}>
+                    </Icon>
+                    <Typography style={{fontSize:'calc(10px + 0.5vw)',color:'white',margin:'0px 0px 0px 15px', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {song.song.title} </Typography>
+                    <Typography style={{position:'absolute', marginLeft:'80vw',fontSize:'calc(10px + 0.5vw)',color:'white', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}> {song.song.streams.toLocaleString()} streams </Typography>
+                </div>
+            ))}
+            </div>
+            <div>
+
+            </div>
+        </div>
+    )
 }
 
 export default Artist;

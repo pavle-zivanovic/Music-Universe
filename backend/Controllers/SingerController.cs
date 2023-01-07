@@ -105,6 +105,59 @@ namespace Music_Universe.Controllers
             return Ok(singer);
         }
 
+        [Route("GetSingerStats/{singerName}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSingerStats(string singerName)
+        {
+            var singerStats = await neo4j.Cypher.Match("(s: Singer)")
+                              .Where((Singer s) => s.name == singerName)
+                              .Return((s) => new 
+                                            {
+                                                singerName = s.As<Singer>().name,
+                                                birthday = s.As<Singer>().birthday,
+                                                birthplace = s.As<Singer>().birthplace,
+                                                biography = s.As<Singer>().biography,
+                                            })
+                              .ResultsAsync;
+
+            return Ok(singerStats);
+        }
+
+        [Route("GetSingerSongs/{singerName}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSingerSongs(string singerName)
+        {
+
+            var allSongs = await neo4j.Cypher.Match("(s: Singer)-[r:sings]->(song:Song)")
+                              .Where((Singer s) => s.name == singerName)
+                              .Return((s, song) => new 
+                                            {
+                                                Song = song.As<Song>(),
+                                                singerName = s.As<Singer>().name
+                                            })
+                              .ResultsAsync;                                      
+
+            return Ok(allSongs);
+        }
+
+        [Route("GetSingerPopularSongs/{singerName}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSingerPopularSongs(string singerName)
+        {
+
+             var popularSongs = await neo4j.Cypher.Match("(s: Singer)-[r:sings]->(song:Song)")
+                              .Where((Singer s) => s.name == singerName)
+                              .Return((s, song) => new 
+                                            {
+                                                Song = song.As<Song>(),
+                                                singerName = s.As<Singer>().name
+                                            })
+                              .Limit(10)              
+                              .ResultsAsync;                                   
+
+            return Ok(popularSongs);
+        }
+
 
         [Route("GetSongwritter/{songwriterName}")]
         [HttpGet]
