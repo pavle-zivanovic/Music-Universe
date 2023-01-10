@@ -267,6 +267,11 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchSongs(string name)
         {
+            if(name == "")
+            {
+                return Ok(2);
+            }
+
             var song = await neo4j.Cypher.Match("(s: Song)<-[r:sings]-(singer:Singer)")
                                 .Where((Song s, Singer singer) => s.title == name)
                                 .Return((s, singer) => new 

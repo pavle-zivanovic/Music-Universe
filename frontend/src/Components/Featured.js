@@ -5,18 +5,17 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import {useEffect, useState} from "react";
-import PlayBar from './PlayBar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext, songIDContext } from './ArtistContext';
 
 
-function Featured(){
+function Featured({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/"+0,
+        fetch("/Song/GetSongsFeatured/"+10,
         {
             method:"GET",
             headers: {
@@ -29,6 +28,38 @@ function Featured(){
                 console.log(data)
             });
       },[])
+
+      useEffect(() => {
+        if(search != null)
+        {
+            fetch("/Song/SearchSongs/"+search,
+            {
+                method:"GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((res) =>  res.json())
+            .then((data) => {
+                    setSongs(data);
+                });
+        }
+        else
+        {
+            fetch("/Song/GetSongsFeatured/"+10,
+            {
+                method:"GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((res) =>  res.json())
+            .then((data) => {
+                    setSongs(data);
+                });
+        }
+      
+      },[search])
 
       return(
         <div>
@@ -50,7 +81,7 @@ function Featured1({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+0+"/"+songID,
+        fetch("/Song/LikeTheSong/"+10+"/"+songID,
         {
             method:"PUT",
             headers:{

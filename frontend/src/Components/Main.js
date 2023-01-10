@@ -34,6 +34,7 @@ import PlayBar from './PlayBar';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext, songIDContext } from './ArtistContext';
 import SongView from './SongView';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -280,7 +281,7 @@ function Main(){
             >
             <AccountCircle />
             </IconButton>
-            <p>Profile</p>
+            <p>Payaz</p>
         </MenuItem>
 
       </Menu>
@@ -326,6 +327,12 @@ function Main(){
   const [trackIndex, setTrackIndex] = useState();
   const [singerIndex, setSingerIndex] = useState();
   const [songId, setSongId] = useState();
+
+  const [searchtext, setSearchtext] = useState("");
+
+  function getSearchValue(e){
+    setSearchtext(e.target.value);
+  }
 
   return (
     <div>
@@ -396,6 +403,7 @@ function Main(){
               <StyledInputBase
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
+                onChange={getSearchValue}
               />
             </Search>
             <Box sx={{ flexGrow: 1 }} />
@@ -417,14 +425,16 @@ function Main(){
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-haspopup="true"
-              >
-                <AccountCircle />
-              </IconButton>
+              <Tooltip title="payaz">
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-haspopup="true"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </Tooltip>
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
               <IconButton
@@ -534,8 +544,8 @@ function Main(){
               <singerIndexContext.Provider value={{singerIndex, setSingerIndex}}>
               <songIDContext.Provider value={{songId, setSongId}}>
               <Routes>
-                  <Route path="" element={<Featured />} />
-                  <Route path="foryou" element={<ForYou />} />
+                  <Route path="" element={<Featured search={searchtext != "" ? searchtext : null} />} />
+                  <Route path="foryou" element={<ForYou search={searchtext != "" ? searchtext : null} />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="artist" element={<Artist />} />
                   <Route path="song" element={<SongView />} />
