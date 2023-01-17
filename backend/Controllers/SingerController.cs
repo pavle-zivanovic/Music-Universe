@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using Models;
 using Neo4jClient;
-using ServiceStack.Redis;
+using StackExchange.Redis;
+using Services;
 
 namespace Music_Universe.Controllers
 {
@@ -18,13 +19,17 @@ namespace Music_Universe.Controllers
         private readonly IGraphClient neo4j;
 
         private readonly JwtService jwtService;
-        private readonly RedisClient redis = 
-        new("redis://default:redispw@localhost:49153");
 
-        public SingerController(IGraphClient _neo4j,JwtService JwtService)
+        private readonly IConnectionMultiplexer redis;
+
+        private readonly ICacheService cacheService;
+
+        public SingerController(IGraphClient _neo4j,JwtService JwtService,IConnectionMultiplexer _redis, ICacheService _cacheService)
         {
                 neo4j = _neo4j;
                 jwtService = JwtService;
+                redis = _redis;
+                cacheService = _cacheService;
         }
 
         // Create Singer entity
@@ -173,6 +178,50 @@ namespace Music_Universe.Controllers
                               .ResultsAsync;
 
             return Ok(songwriter);
+        }
+
+        [Route("GetCacheSongList/{key}")]
+        [HttpGet]
+        public async Task<IActionResult> GetCacheSongList(string key)
+        {
+            var value = await cacheService.GetCacheListAsync(key);
+            return Ok(value);
+        }
+        
+        [Route("SetCacheSongList/{key}")]
+        [HttpPost]
+        public async Task<IActionResult> SetCacheSongList(string key, List<int> values)
+        {
+            await cacheService.SetCacheListAsync(key, values);
+            return Ok();
+        }
+
+        [Route("GetCacheSong/{key}")]
+        [HttpGet]
+        public async Task<IActionResult> GetCacheSong(string key)
+        {
+            var value = await cacheService.GetCacheStringAsync(key);
+            return Ok(value);
+        }
+
+        [Route("SetCacheSong/{key}/{value}")]
+        [HttpPost]
+        public async Task<IActionResult> SetCacheSong(string key, string value)
+        {
+            await cacheService.SetCacheStringAsync(key, value);
+            return Ok();
+        }
+
+        [Route("PublishSong/{singerID}/{songName}/{singerName}")]
+        [HttpPost]
+        public async Task<IActionResult> PublishSong(int singerID, string songName, string singerName)
+        {
+            var pub = redis.GetSubscriber();
+
+            await pub.PublishAsync("channel"+singerID, 
+            singerName + " je izbacio pesmu pod nazivom " + songName);
+            
+            return Ok("Sve ok");
         }
     }
 }

@@ -8,6 +8,8 @@ using System.IdentityModel.Tokens.Jwt;
 using Neo4jClient;
 using ServiceStack.Redis;
 using Models;
+using StackExchange.Redis;
+using Services;
 
 namespace Music_Universe.Controllers
 {
@@ -17,14 +19,14 @@ namespace Music_Universe.Controllers
     {
         private readonly IGraphClient neo4j;
         private readonly JwtService jwtService;
+        private readonly IConnectionMultiplexer redis;
+        private readonly ICacheService cacheService;
 
-        private readonly RedisClient redis = 
-        new("redis://default:redispw@localhost:49153");
-
-        public UserController(IGraphClient _neo4j, JwtService JwtService)
+        public UserController(IGraphClient _neo4j, JwtService JwtService, IConnectionMultiplexer _redis, ICacheService _cacheService)
         {
                 neo4j = _neo4j;
                 jwtService = JwtService;
+                redis = _redis;
         }
 
 
@@ -99,6 +101,29 @@ namespace Music_Universe.Controllers
                                              .Return(n => n.As<User>()).ResultsAsync;
 
             return Ok(users);
+        }
+
+        [Route("Subscribe/{singerID}/{userID}")]
+        [HttpPost]
+        public async Task<IActionResult> Subscribe(int singerID, int userID)
+        {
+            var sub = redis.GetSubscriber();
+            string channel = "channel"+singerID;
+
+            await sub.SubscribeAsync(channel, ((channel, value) =>
+            {
+                cacheService.AddElementCacheListAsync("myNotifications" + userID, value);
+            }));
+            
+            return Ok("Sve ok");
+        }
+
+        [Route("GetCacheMessageList/{key}")]
+        [HttpGet]
+        public async Task<IActionResult> GetCacheMessageList(string key)
+        {
+            var value = await cacheService.GetCacheListStringAsync(key);
+            return Ok(value);
         }
     }
 }

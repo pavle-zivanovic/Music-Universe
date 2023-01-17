@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ namespace Music_Universe
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+            ThreadPool.SetMinThreads(15, 15);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

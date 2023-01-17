@@ -12,8 +12,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Neo4jClient;
-using ServiceStack.Redis;
+using StackExchange.Redis;
 using Models;
+using Services;
 
 namespace Music_Universe
 {
@@ -65,6 +66,10 @@ namespace Music_Universe
             var client = new BoltGraphClient(new Uri("bolt://localhost:7687"),"neo4j","stump");
             client.ConnectAsync();
             services.AddSingleton<IGraphClient>(client);
+
+            services.AddSingleton<IConnectionMultiplexer>(x =>
+                ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheService, RedisCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
