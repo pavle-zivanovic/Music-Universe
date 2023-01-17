@@ -184,7 +184,7 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCacheSongList(string key)
         {
-            var value = await cacheService.GetCacheListAsync(key);
+            var value = await cacheService.GetCacheListAsync("music:"+key);
             return Ok(value);
         }
         
@@ -192,7 +192,7 @@ namespace Music_Universe.Controllers
         [HttpPost]
         public async Task<IActionResult> SetCacheSongList(string key, List<int> values)
         {
-            await cacheService.SetCacheListAsync(key, values);
+            await cacheService.SetCacheListAsync("music:"+key, values);
             return Ok();
         }
 
@@ -200,7 +200,7 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCacheSong(string key)
         {
-            var value = await cacheService.GetCacheStringAsync(key);
+            var value = await cacheService.GetCacheStringAsync("music:"+key);
             return Ok(value);
         }
 
@@ -208,7 +208,7 @@ namespace Music_Universe.Controllers
         [HttpPost]
         public async Task<IActionResult> SetCacheSong(string key, string value)
         {
-            await cacheService.SetCacheStringAsync(key, value);
+            await cacheService.SetCacheStringAsync("music"+key, value);
             return Ok();
         }
 

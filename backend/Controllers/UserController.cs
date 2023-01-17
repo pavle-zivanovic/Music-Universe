@@ -27,6 +27,7 @@ namespace Music_Universe.Controllers
                 neo4j = _neo4j;
                 jwtService = JwtService;
                 redis = _redis;
+                cacheService = _cacheService;
         }
 
 
@@ -112,7 +113,7 @@ namespace Music_Universe.Controllers
 
             await sub.SubscribeAsync(channel, ((channel, value) =>
             {
-                cacheService.AddElementCacheListAsync("myNotifications" + userID, value);
+                cacheService.AddElementCacheListAsync("music:myNotifications:" + userID, value);
             }));
             
             return Ok("Sve ok");
@@ -122,7 +123,7 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCacheMessageList(string key)
         {
-            var value = await cacheService.GetCacheListStringAsync(key);
+            var value = await cacheService.GetCacheListStringAsync("music:"+key);
             return Ok(value);
         }
     }
