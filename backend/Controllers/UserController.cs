@@ -119,6 +119,18 @@ namespace Music_Universe.Controllers
             return Ok("Sve ok");
         }
 
+        [Route("UnSubscribe/{singerID}/{userID}")]
+        [HttpDelete]
+        public async Task<IActionResult> UnSubscribe(int singerID, int userID)
+        {
+            var sub = redis.GetSubscriber();
+            string channel = "channel"+singerID;
+
+            await cacheService.DeleteCacheListStringAsync("music:myNotifications:" + userID);
+           
+            return Ok("Sve ok");
+        }
+
         [Route("GetCacheMessageList/{key}")]
         [HttpGet]
         public async Task<IActionResult> GetCacheMessageList(string key)

@@ -16,5 +16,7 @@ namespace Services
         Task AddElementCacheListAsync(string key, string value);
 
         Task<List<string>> GetCacheListStringAsync(string key);
+
+        Task DeleteCacheListStringAsync(string key);
     }
 }

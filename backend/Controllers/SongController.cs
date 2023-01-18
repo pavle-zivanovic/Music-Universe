@@ -360,5 +360,39 @@ namespace Music_Universe.Controllers
 
             return Ok(song.LastOrDefault());
         }
+
+        [Route("AddSongImage/{songID}/{imagePath}")]
+        [HttpPut]
+        public async Task<IActionResult> AddSongImage(int songID, string imagePath)
+        {
+            if(songID < 0)
+            {
+                return BadRequest("Nevalidan id pesme!");
+            }
+
+            await neo4j.Cypher.Match("(s:Song)")
+                              .Where((Song s) => s.id == songID)
+                              .Set("s.image = " + imagePath)
+                              .ExecuteWithoutResultsAsync();
+
+            return Ok("Uspesno");
+        }
+
+        [Route("AddSongMusic/{songID}/{musicPath}")]
+        [HttpPut]
+        public async Task<IActionResult> AddSongMusic(int songID, string musicPath)
+        {
+            if(songID < 0)
+            {
+                return BadRequest("Nevalidan id pesme!");
+            }
+
+            await neo4j.Cypher.Match("(s:Song)")
+                              .Where((Song s) => s.id == songID)
+                              .Set("s.song = " + musicPath)
+                              .ExecuteWithoutResultsAsync();
+
+            return Ok("Uspesno");
+        }
     }
 }

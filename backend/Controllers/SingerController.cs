@@ -208,7 +208,7 @@ namespace Music_Universe.Controllers
         [HttpPost]
         public async Task<IActionResult> SetCacheSong(string key, string value)
         {
-            await cacheService.SetCacheStringAsync("music"+key, value);
+            await cacheService.SetCacheStringAsync("music:"+key, value);
             return Ok();
         }
 

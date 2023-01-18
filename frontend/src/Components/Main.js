@@ -334,6 +334,21 @@ function Main(){
     setSearchtext(e.target.value);
   }
 
+  const [notifications, setNotifications] = useState([]);
+  const getNotifications = () =>{
+    let value = "myNotifications:" + 10;
+    fetch("/User/GetCacheMessageList/"+value,
+    {
+        method:"GET",
+        headers:{
+            "Content-Type":"application/json"
+        },
+    }).then((res) =>  res.json())
+    .then((data) => {
+            setNotifications(data);
+        });
+}
+
   return (
     <div>
       <trackListContext.Provider value={{trackList, setTrackList}}>
@@ -420,9 +435,12 @@ function Main(){
               <IconButton
                 size="large"
                 aria-label="show 17 new notifications"
+                onClick={getNotifications}
               >
-                <Badge badgeContent={17} color="error">
-                  <NotificationsIcon />
+                <Badge badgeContent={7} color="error">
+                  <Tooltip title={notifications+","}>
+                    <NotificationsIcon />
+                  </Tooltip>
                 </Badge>
               </IconButton>
               <Tooltip title="payaz">
