@@ -14,7 +14,7 @@ function ForYou({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsForYou/"+10,
+        fetch("/Song/GetSongsForYou/"+11,
         {
             method:"GET",
             headers: {
@@ -44,7 +44,7 @@ function ForYou({search}){
         }
         else
         {
-            fetch("/Song/GetSongsForYou/"+10,
+            fetch("/Song/GetSongsForYou/"+11,
             {
                 method:"GET",
                 headers: {
@@ -92,7 +92,7 @@ function ForYou1({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        fetch("/Song/LikeTheSong/"+11+"/"+songID,
         {
             method:"PUT",
             headers:{

@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { Button, Icon } from '@mui/material';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { singerIndexContext, songIDContext } from './ArtistContext';
 
 function PlayBar(){
 
@@ -192,6 +193,46 @@ function PlayBar(){
 
       const {trackList, setTrackList} = React.useContext(trackListContext)  
       const {trackIndex, setTrackIndex} = React.useContext(trackIndexContext)  
+      const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)    
+      const {songId, setSongId} = React.useContext(songIDContext)  
+
+      React.useEffect(() =>{
+        if(trackList==null || trackList.length==0)
+        {
+          fetch("/Singer/GetCacheSongList/"+ "SongList:11",
+          {
+            method:"GET",
+            headers:{
+                "Content-Type":"application/json"
+            },
+          }).then((res) =>  res.json())
+            .then((data) => {
+              fetch("/Song/GetSongListFromIDs/"+ 11,
+              {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(data)
+                
+              }).then((res) =>  res.json())
+                .then((data2) => {
+                    setTrackList(data2)
+                    fetch("/Singer/GetCacheSong/"+"Song:11",
+                    {
+                        method:"GET",
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+                    }).then((res) =>  res.json())
+                    .then((data3) => {
+                            setTrackIndex(data3)
+                        });
+                });
+                
+            });
+        }
+      })
 
       React.useEffect(() => {
         console.log(trackList)
@@ -199,6 +240,34 @@ function PlayBar(){
         if(trackList!=null && trackIndex>=0){
           setCurSong(trackList[trackIndex]);
           console.log(trackList[trackIndex]);
+
+          let songIDs = trackList.map(song => 
+            {return song.song.id});
+
+          console.log(songIDs);
+          
+            
+          fetch("/Singer/SetCacheSongList/"+ "SongList:11",
+          {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(songIDs)
+            
+          })
+
+          fetch("/Singer/SetCacheSong/"+ "Song:11" +"/" + trackIndex,
+          {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            
+          })
+
+          setSingerIndex(trackList[trackIndex].singerName)
+          setSongId(trackList[trackIndex].song.id)
 
           if(firstRender)
           {

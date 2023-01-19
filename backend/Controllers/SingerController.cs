@@ -118,6 +118,7 @@ namespace Music_Universe.Controllers
                               .Where((Singer s) => s.name == singerName)
                               .Return((s) => new 
                                             {
+                                                id = s.As<Singer>().id,
                                                 singerName = s.As<Singer>().name,
                                                 birthday = s.As<Singer>().birthday,
                                                 birthplace = s.As<Singer>().birthplace,

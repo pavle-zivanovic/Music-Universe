@@ -394,5 +394,39 @@ namespace Music_Universe.Controllers
 
             return Ok("Uspesno");
         }
+
+        [Route("GetSongListFromIDs/{userID}")]
+        [HttpPost]
+        public async Task<IActionResult> GetSongListFromIDs(int userID , [FromBody]List<int> songIds)
+        {
+            int a_ = songIds[0];
+            var song_ = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
+                                          .Where((User user, Song song) => user.id == userID && song.id==a_)
+                                          .Return((singer, song, rating) => new 
+                                            {
+                                                Song = song.As<Song>(),
+                                                singerName = singer.As<Singer>().name,
+                                                rating = rating.As<Rating>().like
+                                            })
+                                          .ResultsAsync; 
+            var array = new[]{song_.LastOrDefault()};
+            var list = array.ToList();
+            for(int i=1; i<songIds.Count; i++){
+                int a = songIds[i];
+                var song = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
+                                          .Where((User user, Song song) => user.id == userID && song.id==a)
+                                          .Return((singer, song, rating) => new 
+                                            {
+                                                Song = song.As<Song>(),
+                                                singerName = singer.As<Singer>().name,
+                                                rating = rating.As<Rating>().like
+                                            })
+                                          .ResultsAsync;    
+                list.Add(song.LastOrDefault());                                                
+            }
+            
+
+            return Ok(list);
+        }
     }
 }

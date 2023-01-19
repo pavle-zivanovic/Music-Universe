@@ -353,6 +353,8 @@ function Main(){
     <div>
       <trackListContext.Provider value={{trackList, setTrackList}}>
       <trackIndexContext.Provider value={{trackIndex, setTrackIndex}}>
+      <singerIndexContext.Provider value={{singerIndex, setSingerIndex}}>
+      <songIDContext.Provider value={{songId, setSongId}}>
       <Box sx={{ flexGrow: 1, width:"100%" }}>
         <AppBar 
         position="sticky" 
@@ -559,8 +561,6 @@ function Main(){
                 <Button onClick={handleSubmit} variant="contained" color="secondary" sx={{fontWeight:"bold"}}>Sumbit</Button>
               </DialogActions>
           </Dialog> 
-              <singerIndexContext.Provider value={{singerIndex, setSingerIndex}}>
-              <songIDContext.Provider value={{songId, setSongId}}>
               <Routes>
                   <Route path="" element={<Featured search={searchtext != "" ? searchtext : null} />} />
                   <Route path="foryou" element={<ForYou search={searchtext != "" ? searchtext : null} />} />
@@ -569,11 +569,11 @@ function Main(){
                   <Route path="song" element={<SongView />} />
                   <Route path="/*" element={<LoginForm />} />
               </Routes>
-              </songIDContext.Provider> 
-              </singerIndexContext.Provider> 
         </div>
       </Box>
       <PlayBar/> 
+      </songIDContext.Provider> 
+      </singerIndexContext.Provider> 
       </trackIndexContext.Provider>  
       </trackListContext.Provider>            
     </div>

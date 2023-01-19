@@ -21,7 +21,7 @@ namespace Services
 
             for(int i=0; i < lenlist; i++)
             {
-                int a = (int)await db.ListLeftPopAsync(key);
+                int a = (int)await db.ListGetByIndexAsync(key, i);
                 lista.Add(a);
             }
            return lista;
@@ -45,9 +45,11 @@ namespace Services
         {
             var db = redis.GetDatabase();
       
+           db.KeyDelete(key);
+
             for(int i=0; i<values.Count; i++)
             {
-                await db.ListLeftPushAsync(key, values[i]);
+                await db.ListRightPushAsync(key, values[i]);
             }
         }
 

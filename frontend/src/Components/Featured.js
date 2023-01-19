@@ -15,7 +15,7 @@ function Featured({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/"+10,
+        fetch("/Song/GetSongsFeatured/"+11,
         {
             method:"GET",
             headers: {
@@ -46,7 +46,7 @@ function Featured({search}){
         }
         else
         {
-            fetch("/Song/GetSongsFeatured/"+10,
+            fetch("/Song/GetSongsFeatured/"+11,
             {
                 method:"GET",
                 headers: {
@@ -81,7 +81,7 @@ function Featured1({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        fetch("/Song/LikeTheSong/"+11+"/"+songID,
         {
             method:"PUT",
             headers:{

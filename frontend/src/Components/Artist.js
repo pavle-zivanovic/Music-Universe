@@ -12,20 +12,15 @@ import PlayBar from './PlayBar';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext } from './ArtistContext';
 
-const songs = ['harem', 'Viktorijina tajnaaaa', 'Bebo', 'Nirvana', 'Haljina', 'Plava'];
-const songImages = ['url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")'];
-const songsStreams = [123111, 512333, 142322, 144457, 88651, 353451, 1766611, 765441, 4321331];
-const about = "Maya Berović is a Bosnian Serb singer. Born in Ilijaš, she debuted in 2007 with the album Život uživo"
 
 const artistCover = 'url("../Images/avatar.jpg")' 
-const birthday = '8 July 1987'
-const birthplace = 'Ilijas'
 //margin:'10% 10% 10% 10%'
 function Artist(){
 
     const [singerStats ,setSingerStats] = React.useState(null);
     const [allSongs ,setAllSongs] = React.useState(null);
     const [popularSongs ,setPopularSongs] = React.useState(null);
+    const [subStatus ,setSubStatus] = React.useState(false);
 
     const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)  
 
@@ -70,6 +65,35 @@ function Artist(){
       },[singerIndex])
       
 
+      async function Subscribe() {
+        if(subStatus==false)
+        {
+            let result = await fetch("/User/Subscribe/" + singerStats.id + "/" + 11, {
+                method : 'POST',
+                headers : {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Accept': 'application/json; charset=utf-8',
+                },
+                })
+            if(result.status==200){
+                setSubStatus(true);
+            }
+        }
+        else
+        {
+            let result = await fetch("/User/UnSubscribe/" + singerStats.id + "/" + 11, {
+                method : 'DELETE',
+                headers : {
+                  'Content-Type': 'application/json; charset=utf-8',
+                  'Accept': 'application/json; charset=utf-8',
+                },
+                })
+            if(result.status==200){
+                setSubStatus(false);
+            }
+        }
+      };
+
     return(
         <div>
             <div
@@ -78,6 +102,8 @@ function Artist(){
                 style={{background: artistCover, width:'200px', height:'200px',backgroundSize:'cover'}}>
                 </Icon>
                 <Typography style={{fontSize:'calc(15px + 2.5vw)',color:'white',margin:'0px 0px 0px calc(15px + 2.5vw)', fontWeight:'bold', textAlign:'right', display:'inline-block', whiteSpace:'nowrap', clear:'both', overflow:'hidden'}}>{singerStats!=null? singerStats.singerName:""}</Typography>
+                <Button style={{marginLeft:'10vw',backgroundColor:'rgb(51,153,255)', color:'white'}}
+                onClick={() => {Subscribe()}}>{subStatus==false? "Subscirbe" : "Unsubscribe"}</Button>
             </div> 
             {popularSongs && popularSongs != null && <PopularSongs songs={popularSongs} />}
             <div>
