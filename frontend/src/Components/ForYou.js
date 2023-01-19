@@ -14,7 +14,7 @@ function ForYou({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsForYou/"+11,
+        fetch("/Song/GetSongsForYou/"+10,
         {
             method:"GET",
             headers: {
@@ -44,7 +44,7 @@ function ForYou({search}){
         }
         else
         {
-            fetch("/Song/GetSongsForYou/"+11,
+            fetch("/Song/GetSongsForYou/"+10,
             {
                 method:"GET",
                 headers: {

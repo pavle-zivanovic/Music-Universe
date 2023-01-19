@@ -1,25 +1,33 @@
 import * as React from 'react';
-import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container';
-import { /*CardMedia,*/ Typography } from '@mui/material';
-//import Card from '@mui/material/Card';
-//import { CardContent, CardMedia, CssBaseline } from '@material-ui/core';
-//import Typography from '@mui/material/Typography';
+import { Typography } from '@mui/material';
+import {useEffect, useState} from "react";
 
-//import Avatar from '@mui/material/Avatar';
-import Icon from '@mui/material/Icon';
-import { styled } from '@mui/material/styles';
-const songImages = ['url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")', 'url("../Images/maya.jpg")'];
-const songs = ['Harem', 'La la la', 'Bebo', 'Nirvana', 'Haljina'];
-const songsStreams = [623111, 512333, 142322, 141457, 88651, 3451];
-const Img = styled('img')({
-    margin: 'auto',
-    display: 'block',
-    maxWidth: '100%',
-    maxHeight: '100%',
-  });
-  const artistNames = ['Maya Berovic', 'Maya Berovic','Maya Berovic','Maya Berovic','Maya Berovic']
   function Charts(){
+    const [songs ,setSongs] = useState(null);
+
+    useEffect(() => {
+        fetch("/Song/GetSongsTopCharts/",
+        {
+            method:"GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) =>  res.json())
+        .then((data) => {
+                setSongs(data);
+                console.log(data)
+            });
+      },[])
+
+      return(
+        <div>
+             {songs && songs != null && <Charts1 songs={songs} />}
+        </div>
+       )
+  }
+
+  function Charts1({songs}){
 
     return(
         <div style={{ 
@@ -71,14 +79,14 @@ const Img = styled('img')({
                             overflow:'hidden'
                             }}> # {index+1} 
                     </Typography>
-                    <Icon
+                    <div
                         style={{
-                            background: songImages[index], 
+                            backgroundImage:song.song.image!=null?'url('+ song.song.image + ')': null, 
                             width:'50px', 
                             height:'50px',
                             backgroundSize:'cover', 
                             marginLeft:'15px'}}>
-                    </Icon>
+                    </div>
                     <div style={{display:'flex', flexDirection:'column'}}>
                         <Typography variant='body2' gutterBottom
                             style={{
@@ -91,7 +99,7 @@ const Img = styled('img')({
                                 clear:'both', 
                                 overflow:'hidden'
                                 }}> 
-                                {songs[index]}
+                                {song.song.title}
                         </Typography>
                         <Typography color="text.secondary" variant='h6'
                             style={{
@@ -105,7 +113,7 @@ const Img = styled('img')({
                                 clear:'both', 
                                 overflow:'hidden'
                                 }}> 
-                                {artistNames[index]}
+                                {song.singerName}
                         </Typography>
                     </div>
                     
@@ -122,7 +130,7 @@ const Img = styled('img')({
                             clear:'both', 
                             overflow:'hidden'
                             }}> 
-                            {songsStreams[index].toLocaleString()} streams 
+                            {song.song.streams.toLocaleString()} streams 
                     </Typography>
                     
                 </div>

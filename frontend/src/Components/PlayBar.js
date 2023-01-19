@@ -207,7 +207,7 @@ function PlayBar(){
             },
           }).then((res) =>  res.json())
             .then((data) => {
-              fetch("/Song/GetSongListFromIDs/"+ 11,
+              fetch("/Song/GetSongListFromIDs/"+ 10,
               {
                 method:"POST",
                 headers:{

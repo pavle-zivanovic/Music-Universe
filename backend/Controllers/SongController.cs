@@ -27,11 +27,10 @@ namespace Music_Universe.Controllers
                 jwtService = JwtService;
         }
 
-        // Create Song entity
-        // Radi  ali bez provera  bice zavrseno na kraju
+    
         [Route("AddSong/{jwt}/{pevacID}/{albumID}/{songwriterID}")]
         [HttpPost]
-        public async Task<IActionResult> AddSong([FromBody] Song song , string jwt , int pevacID , int albumID , int songwriterID)
+        public async Task<IActionResult> AddSong([FromBody] Song song, string jwt , int pevacID , int albumID , int songwriterID)
         {
             
             var token = jwtService.Verify(jwt);
@@ -210,7 +209,7 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAlbum(string albumName)
         {
-            if(albumName == "") {return BadRequest("Nevalidan id!");}
+            if(albumName == "empty") {return Ok(-1);}
 
             var album = await neo4j.Cypher.Match("(a: Album)")
                               .Where((Album a) => a.title == albumName)
@@ -361,40 +360,7 @@ namespace Music_Universe.Controllers
             return Ok(song.LastOrDefault());
         }
 
-        [Route("AddSongImage/{songID}/{imagePath}")]
-        [HttpPut]
-        public async Task<IActionResult> AddSongImage(int songID, string imagePath)
-        {
-            if(songID < 0)
-            {
-                return BadRequest("Nevalidan id pesme!");
-            }
-
-            await neo4j.Cypher.Match("(s:Song)")
-                              .Where((Song s) => s.id == songID)
-                              .Set("s.image = " + imagePath)
-                              .ExecuteWithoutResultsAsync();
-
-            return Ok("Uspesno");
-        }
-
-        [Route("AddSongMusic/{songID}/{musicPath}")]
-        [HttpPut]
-        public async Task<IActionResult> AddSongMusic(int songID, string musicPath)
-        {
-            if(songID < 0)
-            {
-                return BadRequest("Nevalidan id pesme!");
-            }
-
-            await neo4j.Cypher.Match("(s:Song)")
-                              .Where((Song s) => s.id == songID)
-                              .Set("s.song = " + musicPath)
-                              .ExecuteWithoutResultsAsync();
-
-            return Ok("Uspesno");
-        }
-
+        
         [Route("GetSongListFromIDs/{userID}")]
         [HttpPost]
         public async Task<IActionResult> GetSongListFromIDs(int userID , [FromBody]List<int> songIds)

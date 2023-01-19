@@ -104,7 +104,7 @@ function Main(){
   //const [songID, setSongID] = React.useState(null);
   const [songName , setSongName] = React.useState('');
   const [singerName , setSingerName] = React.useState('');
-  const [albumName , setAlbumName] = React.useState('');
+  const [albumName , setAlbumName] = React.useState(null);
   const [songWritter ,setSongWritter] = React.useState('');
   const [songGenre , setSongGenre] = React.useState('');
   const [releaseDate , setReleaseDate] = React.useState('');
@@ -141,7 +141,7 @@ function Main(){
     setNameError(false);;setSingerError(false);setGenreError(false);setLyricsError(false);setAlbumError(false);setWritterError(false);
     setDateError(false);setSongFileError(false);setCoverImageError(false);
 
-
+    
     if (songName === ''){
         setNameError(true)
     }
@@ -200,7 +200,7 @@ function Main(){
     });
     let pevac = await rezPevac.json();
  
-    
+    if (albumName == null){setAlbumName("empty")}
     let rezAlbum = await fetch("/Song/GetAlbum/" + albumName,{
       method : 'GET',
       headers : {
@@ -209,7 +209,7 @@ function Main(){
       }
     });
     let album = await rezAlbum.json();
-    if (album == null){album = -1;}
+   
 
     let rezTekstopisac = await fetch("/Singer/GetSongwriter/" + songWritter,{
       method : 'GET',
@@ -230,7 +230,8 @@ function Main(){
       streams : 0 ,
     };
     console.log(song);
-    let result = await fetch("/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, {
+    await fetch("/Song/AddSong/" + token + "/" + pevac + "/" + album +"/" + tekstopisac, 
+    {
       method : 'POST',
       headers : {
         'Content-Type': 'application/json; charset=utf-8',
@@ -239,7 +240,15 @@ function Main(){
       body : JSON.stringify(song)
     });
 
-    //let a = await result.json(); 
+    //umesto singerName treba username da se salje
+    await fetch("/Singer/PublishSong/" + pevac + "/" + song.title + "/" + singerName, 
+    {
+      method : 'POST',
+      headers : {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json; charset=utf-8',
+      },
+    })
   }
 
   const renderMobileMenuRight = (
@@ -538,7 +547,7 @@ function Main(){
                             //maxRows={'5'}  
                             sx={{ width : "100%", height: "40%"}}/>
                     <TextField id="outlined-basic" label="Song File"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="file" color="primary" maxRows ={'1'} required 
-                        error={songFileError}  onChange={(e) => setSongFile(e.target.value)}
+                        error={songFileError}  onChange={(e) => setSongFile("../Music/"+e.target.value.substring(12))}
                             sx={{
                             width :"45%",
                             marginRight : "5%",
@@ -546,7 +555,7 @@ function Main(){
                             marginBottom : "5%",
                             }}/>
                     <TextField id="outlined-basic" label="Cover Image"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="file" color="primary" maxRows ={'1'} required 
-                        error={coverImageError}  onChange={(e) => setCoverImage(e.target.value)}
+                        error={coverImageError}  onChange={(e) => setCoverImage("../Images/"+e.target.value.substring(12))}
                             sx={{
                             width :"45%",
                             marginLeft : "5%",

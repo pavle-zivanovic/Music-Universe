@@ -15,7 +15,7 @@ function Featured({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/"+11,
+        fetch("/Song/GetSongsFeatured/"+10,
         {
             method:"GET",
             headers: {
@@ -46,7 +46,7 @@ function Featured({search}){
         }
         else
         {
-            fetch("/Song/GetSongsFeatured/"+11,
+            fetch("/Song/GetSongsFeatured/"+10,
             {
                 method:"GET",
                 headers: {

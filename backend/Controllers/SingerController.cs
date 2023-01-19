@@ -167,9 +167,9 @@ namespace Music_Universe.Controllers
         }
 
 
-        [Route("GetSongwritter/{songwriterName}")]
+        [Route("GetSongwriter/{songwriterName}")]
         [HttpGet]
-        public async Task<IActionResult> GetSongwritter(string songwriterName)
+        public async Task<IActionResult> GetSongwriter(string songwriterName)
         {
             if(songwriterName == "") {return BadRequest("Nevalidan id!");}
 
