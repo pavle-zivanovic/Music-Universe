@@ -10,12 +10,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext, songIDContext } from './ArtistContext';
 
+const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 function Featured({search}){
     const [songs ,setSongs] = useState(null);
 
     useEffect(() => {
-        fetch("/Song/GetSongsFeatured/"+10,
+        fetch("/Song/GetSongsFeatured/"+token,
         {
             method:"GET",
             headers: {
@@ -46,7 +47,7 @@ function Featured({search}){
         }
         else
         {
-            fetch("/Song/GetSongsFeatured/"+10,
+            fetch("/Song/GetSongsFeatured/"+token,
             {
                 method:"GET",
                 headers: {
@@ -81,7 +82,7 @@ function Featured1({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+11+"/"+songID,
+        fetch("/Song/LikeTheSong/"+token+"/"+songID,
         {
             method:"PUT",
             headers:{
@@ -94,7 +95,7 @@ function Featured1({songs}){
     const DeleteSong = (id) =>{
         songID = id;
 
-        fetch("/Song/DeleteSong/"+songID+"/"+"payaz",
+        fetch("/Song/DeleteSong/"+songID+"/"+token,
         {
             method:"DELETE",
             headers:{

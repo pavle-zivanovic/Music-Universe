@@ -13,6 +13,8 @@ import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { singerIndexContext, songIDContext } from './ArtistContext';
 
+const token = (JSON.parse(window.localStorage.getItem('user-info')));
+
 function PlayBar(){
 
     const [firstRender, setFirstRender] = React.useState(true)
@@ -199,7 +201,7 @@ function PlayBar(){
       React.useEffect(() =>{
         if(trackList==null || trackList.length==0)
         {
-          fetch("/Singer/GetCacheSongList/"+ "SongList:11",
+          fetch("/Singer/GetCacheSongList/"+ token,
           {
             method:"GET",
             headers:{
@@ -207,7 +209,7 @@ function PlayBar(){
             },
           }).then((res) =>  res.json())
             .then((data) => {
-              fetch("/Song/GetSongListFromIDs/"+ 10,
+              fetch("/Song/GetSongListFromIDs/"+ token,
               {
                 method:"POST",
                 headers:{
@@ -218,7 +220,7 @@ function PlayBar(){
               }).then((res) =>  res.json())
                 .then((data2) => {
                     setTrackList(data2)
-                    fetch("/Singer/GetCacheSong/"+"Song:11",
+                    fetch("/Singer/GetCacheSong/"+token,
                     {
                         method:"GET",
                         headers:{
@@ -247,7 +249,7 @@ function PlayBar(){
           console.log(songIDs);
           
             
-          fetch("/Singer/SetCacheSongList/"+ "SongList:11",
+          fetch("/Singer/SetCacheSongList/"+ token,
           {
             method:"POST",
             headers:{
@@ -257,7 +259,7 @@ function PlayBar(){
             
           })
 
-          fetch("/Singer/SetCacheSong/"+ "Song:11" +"/" + trackIndex,
+          fetch("/Singer/SetCacheSong/"+ token +"/" + trackIndex,
           {
             method:"POST",
             headers:{

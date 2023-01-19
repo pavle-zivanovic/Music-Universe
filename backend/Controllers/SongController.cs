@@ -144,10 +144,18 @@ namespace Music_Universe.Controllers
             return Ok(1);
         }
 
-        [Route("GetSongsFeatured/{userID}")]
+        [Route("GetSongsFeatured/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetSongsFeatured(int userID)
+        public async Task<IActionResult> GetSongsFeatured(string jwt)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+            if(userID < 0)
+            {
+                return BadRequest("Nevalidan id!");
+            }
+
+
             var songs = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
                                           .Where((User user) => user.id == userID)
                                           .Return((singer, song, rating) => new 
@@ -163,10 +171,13 @@ namespace Music_Universe.Controllers
         }
 
 
-        [Route("GetSongsForYou/{userID}")]
+        [Route("GetSongsForYou/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetSongsForYou(int userID)
+        public async Task<IActionResult> GetSongsForYou(string jwt)
         {
+
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
             if(userID < 0)
             {
                 return BadRequest("Nevalidan id!");
@@ -209,7 +220,7 @@ namespace Music_Universe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAlbum(string albumName)
         {
-            if(albumName == "empty") {return Ok(-1);}
+            if(albumName == "-1") {return Ok(-1);}
 
             var album = await neo4j.Cypher.Match("(a: Album)")
                               .Where((Album a) => a.title == albumName)
@@ -220,10 +231,12 @@ namespace Music_Universe.Controllers
         }
 
 
-        [Route("LikeTheSong/{userID}/{songID}")]
+        [Route("LikeTheSong/{jwt}/{songID}")]
         [HttpPut]
-        public async Task<IActionResult> LikeTheSong(int userID, int songID)
+        public async Task<IActionResult> LikeTheSong(string jwt, int songID)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
             if(userID < 0) 
             {
                 return BadRequest("Nevalidan id korisnika!");
@@ -309,10 +322,20 @@ namespace Music_Universe.Controllers
         }
 
 
-        [Route("DeleteSong/{songID}/{userName}")]
+        [Route("DeleteSong/{songID}/{jwt}")]
         [HttpDelete]
-        public async Task<IActionResult> DeleteSong(int songID, string userName)
+        public async Task<IActionResult> DeleteSong(int songID, string jwt)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            var user = await neo4j.Cypher.Match("(u: User)")
+                              .Where((User u) => u.id == userID)
+                              .Return(u => u.As<User>().userName)
+                              .ResultsAsync;
+
+            string userName = user.LastOrDefault();
+
             var song = await neo4j.Cypher.Match("(s: Song)<-[r:sings]-(singer:Singer)")
                                 .Where((Song s, Singer singer) => singer.name == userName && s.id == songID)
                                 .Return((s, singer) => new 
@@ -361,10 +384,13 @@ namespace Music_Universe.Controllers
         }
 
         
-        [Route("GetSongListFromIDs/{userID}")]
+        [Route("GetSongListFromIDs/{jwt}")]
         [HttpPost]
-        public async Task<IActionResult> GetSongListFromIDs(int userID , [FromBody]List<int> songIds)
+        public async Task<IActionResult> GetSongListFromIDs(string jwt , [FromBody]List<int> songIds)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+            
             int a_ = songIds[0];
             var song_ = await neo4j.Cypher.Match("(user: User)-[r1:Liked]->(rating: Rating)<-[r2:Has]-(song:Song)<-[r3:sings]-(singer:Singer)")
                                           .Where((User user, Song song) => user.id == userID && song.id==a_)

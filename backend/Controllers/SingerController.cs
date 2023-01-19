@@ -181,35 +181,47 @@ namespace Music_Universe.Controllers
             return Ok(songwriter);
         }
 
-        [Route("GetCacheSongList/{key}")]
+        [Route("GetCacheSongList/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetCacheSongList(string key)
+        public async Task<IActionResult> GetCacheSongList(string jwt)
         {
-            var value = await cacheService.GetCacheListAsync("music:"+key);
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            var value = await cacheService.GetCacheListAsync("music:SongList:"+userID);
             return Ok(value);
         }
         
-        [Route("SetCacheSongList/{key}")]
+        [Route("SetCacheSongList/{jwt}")]
         [HttpPost]
-        public async Task<IActionResult> SetCacheSongList(string key, List<int> values)
+        public async Task<IActionResult> SetCacheSongList(string jwt, List<int> values)
         {
-            await cacheService.SetCacheListAsync("music:"+key, values);
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            await cacheService.SetCacheListAsync("music:SongList:"+userID, values);
             return Ok();
         }
 
-        [Route("GetCacheSong/{key}")]
+        [Route("GetCacheSong/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetCacheSong(string key)
+        public async Task<IActionResult> GetCacheSong(string jwt)
         {
-            var value = await cacheService.GetCacheStringAsync("music:"+key);
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            var value = await cacheService.GetCacheStringAsync("music:Song:"+userID);
             return Ok(value);
         }
 
-        [Route("SetCacheSong/{key}/{value}")]
+        [Route("SetCacheSong/{jwt}/{value}")]
         [HttpPost]
-        public async Task<IActionResult> SetCacheSong(string key, string value)
+        public async Task<IActionResult> SetCacheSong(string jwt, string value)
         {
-            await cacheService.SetCacheStringAsync("music:"+key, value);
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            await cacheService.SetCacheStringAsync("music:Song:"+userID, value);
             return Ok();
         }
 

@@ -94,20 +94,27 @@ namespace Music_Universe.Controllers
             return Ok(jwt);
         }
 
-        [Route("Getusers")]
+        [Route("GetuserName/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetuserName(string jwt)
         {
-            var users = await neo4j.Cypher.Match("(n: User)")
-                                             .Return(n => n.As<User>()).ResultsAsync;
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
 
-            return Ok(users);
+            var user = await neo4j.Cypher.Match("(u: User)")
+                                            .Where((User u) => u.id == userID)
+                                            .Return(u => u.As<User>().userName).ResultsAsync;
+
+            return Ok(user);
         }
 
-        [Route("Subscribe/{singerID}/{userID}")]
+        [Route("Subscribe/{singerID}/{jwt}")]
         [HttpPost]
-        public async Task<IActionResult> Subscribe(int singerID, int userID)
+        public async Task<IActionResult> Subscribe(int singerID, string jwt)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
             var sub = redis.GetSubscriber();
             string channel = "channel"+singerID;
 
@@ -119,10 +126,13 @@ namespace Music_Universe.Controllers
             return Ok("Sve ok");
         }
 
-        [Route("UnSubscribe/{singerID}/{userID}")]
+        [Route("UnSubscribe/{singerID}/{jwt}")]
         [HttpDelete]
-        public async Task<IActionResult> UnSubscribe(int singerID, int userID)
+        public async Task<IActionResult> UnSubscribe(int singerID, string jwt)
         {
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
             var sub = redis.GetSubscriber();
             string channel = "channel"+singerID;
 
@@ -131,11 +141,14 @@ namespace Music_Universe.Controllers
             return Ok("Sve ok");
         }
 
-        [Route("GetCacheMessageList/{key}")]
+        [Route("GetCacheMessageList/{jwt}")]
         [HttpGet]
-        public async Task<IActionResult> GetCacheMessageList(string key)
+        public async Task<IActionResult> GetCacheMessageList(string jwt)
         {
-            var value = await cacheService.GetCacheListStringAsync("music:"+key);
+            var token = jwtService.Verify(jwt);
+            int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
+
+            var value = await cacheService.GetCacheListStringAsync("music:MyNotifications:"+userID);
             return Ok(value);
         }
     }

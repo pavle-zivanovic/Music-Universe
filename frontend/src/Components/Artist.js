@@ -12,6 +12,7 @@ import PlayBar from './PlayBar';
 import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext } from './ArtistContext';
 
+const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 const artistCover = 'url("../Images/avatar.jpg")' 
 //margin:'10% 10% 10% 10%'
@@ -22,8 +23,8 @@ function Artist(){
     const [popularSongs ,setPopularSongs] = React.useState(null);
     const [subStatus ,setSubStatus] = React.useState(false);
 
-    const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext)  
-
+    const {singerIndex, setSingerIndex} = React.useContext(singerIndexContext) 
+    
     React.useEffect(() => {
         fetch("/Singer/GetSingerStats/"+singerIndex,
         {
@@ -64,11 +65,10 @@ function Artist(){
         console.log(singerIndex);
       },[singerIndex])
       
-
       async function Subscribe() {
         if(subStatus==false)
         {
-            let result = await fetch("/User/Subscribe/" + singerStats.id + "/" + 11, {
+            let result = await fetch("/User/Subscribe/" + singerStats.id + "/" + token, {
                 method : 'POST',
                 headers : {
                 'Content-Type': 'application/json; charset=utf-8',
@@ -81,7 +81,7 @@ function Artist(){
         }
         else
         {
-            let result = await fetch("/User/UnSubscribe/" + singerStats.id + "/" + 11, {
+            let result = await fetch("/User/UnSubscribe/" + singerStats.id + "/" + token, {
                 method : 'DELETE',
                 headers : {
                   'Content-Type': 'application/json; charset=utf-8',
@@ -146,7 +146,7 @@ function AllSongs({songs}){
     const LikeTheSong = (id) =>{
         songID = id;
 
-        fetch("/Song/LikeTheSong/"+10+"/"+songID,
+        fetch("/Song/LikeTheSong/"+token+"/"+songID,
         {
             method:"PUT",
             headers:{
@@ -159,7 +159,7 @@ function AllSongs({songs}){
     const DeleteSong = (id) =>{
         songID = id;
 
-        fetch("/Song/DeleteSong/"+songID+"/"+"payaz",
+        fetch("/Song/DeleteSong/"+songID+"/"+token,
         {
             method:"DELETE",
             headers:{

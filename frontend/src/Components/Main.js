@@ -35,7 +35,9 @@ import { trackListContext, trackIndexContext } from './PlayBarContext';
 import { singerIndexContext, songIDContext } from './ArtistContext';
 import SongView from './SongView';
 import Tooltip from '@mui/material/Tooltip';
+import { useEffect } from "react";
 
+const token = (JSON.parse(window.localStorage.getItem('user-info')));
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -95,6 +97,31 @@ const pages = [
 ]
 
 function Main(){
+  const[userName, setUserName] = useState(null);
+
+  useEffect(() => {
+    fetch("/User/GetuserName/"+token,
+    {
+        method:"GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then((res) =>  res.json())
+    .then((data) => {
+            console.log(data[0]);
+            setUserName(data[0]);
+        });
+  },[])
+
+  return(
+    <div>
+         {userName && userName != null && <Main1 userName={userName} />}
+    </div>
+   )
+}
+
+function Main1({userName}){
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -104,7 +131,7 @@ function Main(){
   //const [songID, setSongID] = React.useState(null);
   const [songName , setSongName] = React.useState('');
   const [singerName , setSingerName] = React.useState('');
-  const [albumName , setAlbumName] = React.useState(null);
+  const [albumName , setAlbumName] = React.useState("-1");
   const [songWritter ,setSongWritter] = React.useState('');
   const [songGenre , setSongGenre] = React.useState('');
   const [releaseDate , setReleaseDate] = React.useState('');
@@ -200,7 +227,7 @@ function Main(){
     });
     let pevac = await rezPevac.json();
  
-    if (albumName == null){setAlbumName("empty")}
+  
     let rezAlbum = await fetch("/Song/GetAlbum/" + albumName,{
       method : 'GET',
       headers : {
@@ -223,7 +250,7 @@ function Main(){
     const song = {
       title : songName,
       lyrics : songLyrics,
-      year : releaseDate,
+      year : parseInt(releaseDate),
       genre : songGenre,
       song : songFile,
       image : coverImage,
@@ -240,7 +267,6 @@ function Main(){
       body : JSON.stringify(song)
     });
 
-    //umesto singerName treba username da se salje
     await fetch("/Singer/PublishSong/" + pevac + "/" + song.title + "/" + singerName, 
     {
       method : 'POST',
@@ -278,7 +304,7 @@ function Main(){
             <IconButton
             size="large"
             >
-            <Badge badgeContent={17} color="error">
+            <Badge badgeContent={7} color="error">
                 <NotificationsIcon/>
             </Badge>
             </IconButton>
@@ -290,7 +316,7 @@ function Main(){
             >
             <AccountCircle />
             </IconButton>
-            <p>Payaz</p>
+            <p>{userName}</p>
         </MenuItem>
 
       </Menu>
@@ -336,6 +362,7 @@ function Main(){
   const [trackIndex, setTrackIndex] = useState();
   const [singerIndex, setSingerIndex] = useState();
   const [songId, setSongId] = useState();
+  
 
   const [searchtext, setSearchtext] = useState("");
 
@@ -345,8 +372,7 @@ function Main(){
 
   const [notifications, setNotifications] = useState([]);
   const getNotifications = () =>{
-    let value = "myNotifications:" + 10;
-    fetch("/User/GetCacheMessageList/"+value,
+    fetch("/User/GetCacheMessageList/"+token,
     {
         method:"GET",
         headers:{
@@ -454,7 +480,7 @@ function Main(){
                   </Tooltip>
                 </Badge>
               </IconButton>
-              <Tooltip title="payaz">
+              <Tooltip title={userName}>
                 <IconButton
                   size="large"
                   edge="end"
@@ -531,7 +557,7 @@ function Main(){
                             marginTop : "2.5%",
                             marginBottom : "5%",
                             }}/> 
-                    <TextField id="outlined-basic" label="Release Date"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ shrink : true , style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="date" color="primary" maxRows ={'1'} required 
+                    <TextField id="outlined-basic" label="Release Date"  inputProps={{   style: { fontFamily: 'Arial', color: 'white'}}}  InputLabelProps={{ style : { color : "rgb(0, 100, 100)"}}} variant="outlined"  type="text" color="primary" maxRows ={'1'} required 
                         error={dateError}  onChange={(e) => setReleaseDate(e.target.value)}
                             sx={{
                             width :"45%",
