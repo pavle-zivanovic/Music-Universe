@@ -239,7 +239,7 @@ function PlayBar(){
       React.useEffect(() => {
         console.log(trackList)
         console.log(trackIndex)
-        if(trackList!=null && trackIndex>=0){
+        if(trackList!=null && trackIndex>=0 && trackList[trackIndex]!=null){
           setCurSong(trackList[trackIndex]);
           console.log(trackList[trackIndex]);
 
