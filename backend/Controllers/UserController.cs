@@ -148,7 +148,7 @@ namespace Music_Universe.Controllers
             var token = jwtService.Verify(jwt);
             int userID = int.Parse(token.Claims.First(x => x.Type == "id").Value);
 
-            var value = await cacheService.GetCacheListStringAsync("music:MyNotifications:"+userID);
+            var value = await cacheService.GetCacheListStringAsync("music:myNotifications:"+userID);
             return Ok(value);
         }
     }
